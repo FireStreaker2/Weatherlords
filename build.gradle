@@ -9,7 +9,7 @@ buildscript {
     maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
   }
   dependencies {
-
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13'  // Or a compatible version
 
   }
 }
