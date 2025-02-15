@@ -9,7 +9,7 @@ buildscript {
     maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
   }
   dependencies {
-    implementation 'org.apache.httpcomponents:httpclient:4.5.13'  // Or a compatible version
+    
 
   }
 }
@@ -69,11 +69,6 @@ subprojects {
     maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://jitpack.io' }
   }
-}
-configurations.all {
-    resolutionStrategy {
-        force 'org.apache.httpcomponents:httpclient:4.5.13'  // Specify the version you want to use
-    }
 }
 
 eclipse.project.name = 'Weatherlords' + '-parent'
