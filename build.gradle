@@ -70,5 +70,10 @@ subprojects {
     maven { url 'https://jitpack.io' }
   }
 }
+configurations.all {
+    resolutionStrategy {
+        force 'org.apache.httpcomponents:httpclient:4.5.13'  // Specify the version you want to use
+    }
+}
 
 eclipse.project.name = 'Weatherlords' + '-parent'
