@@ -3,19 +3,22 @@ package io.github.firestreaker2.weatherlords;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 
+/**
+ * main menu
+ */
 public class MainMenu implements Screen {
     final Weatherlords game;
-    private Stage stage;
-    private Skin skin;
+    private final Stage stage;
+    private final Skin skin;
 
     public MainMenu(final Weatherlords game) {
         this.game = game;
@@ -24,10 +27,12 @@ public class MainMenu implements Screen {
         Gdx.input.setInputProcessor(stage);
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
+        // TODO: clean up code :3 (dynamic)
         Label title = new Label("WEATHERLORDS", skin);
         title.setColor(Color.WHITE);
         title.setFontScale(2);
-        title.setPosition(280, 400);
+        title.pack();
+        title.setPosition(stage.getWidth() / 2 - title.getWidth() / 2, 400);
 
         TextButton startButton = new TextButton("START", skin);
         TextButton settingsButton = new TextButton("SETTINGS", skin);
@@ -54,7 +59,21 @@ public class MainMenu implements Screen {
             }
         });
 
-        // TODO: add settings + credits screen
+        settingsButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(new SettingsMenu(game));
+                dispose();
+            }
+        });
+
+        creditsButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(new CreditsMenu(game));
+                dispose();
+            }
+        });
 
         quitButton.addListener(new ClickListener() {
             @Override

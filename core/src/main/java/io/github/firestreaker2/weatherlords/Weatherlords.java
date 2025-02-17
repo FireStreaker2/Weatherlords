@@ -6,6 +6,10 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
+/**
+ * main handler for game
+ * invokes main menu
+ */
 public class Weatherlords extends Game {
     public SpriteBatch batch;
     public BitmapFont font;

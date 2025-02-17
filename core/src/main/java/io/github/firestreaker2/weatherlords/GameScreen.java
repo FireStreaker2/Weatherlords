@@ -9,6 +9,10 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 
+/**
+ * actual game class
+ * contains all logic for game
+ */
 public class GameScreen implements Screen {
     final Weatherlords game;
 
@@ -33,7 +37,6 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-
     }
 
     @Override
