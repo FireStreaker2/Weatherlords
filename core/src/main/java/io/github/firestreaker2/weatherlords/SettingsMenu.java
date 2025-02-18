@@ -15,28 +15,24 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 public class SettingsMenu implements Screen {
     final Weatherlords game;
-
     private Stage stage;
-    private Skin skin;
 
     public SettingsMenu(final Weatherlords game) {
         this.game = game;
 
         stage = new Stage(new FitViewport(800, 480));
         Gdx.input.setInputProcessor(stage);
-        skin = new Skin(Gdx.files.internal("uiskin.json"));
 
-        Label title = new Label("SETTINGS", skin);
-        title.setColor(Color.WHITE);
-        title.setFontScale(2);
+        Label title = new Label("SETTINGS", game.labelStyle);
+        title.setColor(Color.BLACK);
         title.pack();
         title.setPosition(stage.getWidth() / 2 - title.getWidth() / 2, 400);
 
-        TextButton graphicsButton = new TextButton("GRAPHICS", skin);
-        TextButton soundsButton = new TextButton("SOUNDS", skin);
-        TextButton uiButton = new TextButton("UI", skin);
-        TextButton controlsButton = new TextButton("CONTROLS", skin);
-        TextButton doneButton = new TextButton("DONE", skin);
+        TextButton graphicsButton = new TextButton("GRAPHICS",game.skin);
+        TextButton soundsButton = new TextButton("SOUNDS", game.skin);
+        TextButton uiButton = new TextButton("UI", game.skin);
+        TextButton controlsButton = new TextButton("CONTROLS", game.skin);
+        TextButton doneButton = new TextButton("DONE", game.skin);
         TextButton[] buttons = { graphicsButton, soundsButton, uiButton, controlsButton, doneButton };
 
         for (TextButton button : buttons) {
@@ -54,7 +50,7 @@ public class SettingsMenu implements Screen {
         soundsButton.setPosition(500, 175);
         uiButton.setPosition(100, 275);
         controlsButton.setPosition(500, 275);
-        doneButton.setPosition(stage.getWidth() / 2 - doneButton.getWidth() / 2, 50);
+        doneButton.setPosition(stage.getWidth() / 2 - doneButton.getWidth() / 2, 60);
 
         stage.addActor(title);
         for (TextButton button : buttons) stage.addActor(button);
@@ -62,7 +58,7 @@ public class SettingsMenu implements Screen {
 
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(Color.BLACK);
+        ScreenUtils.clear(Color.WHITE);
 
         stage.act(delta);
         stage.draw();
@@ -98,6 +94,5 @@ public class SettingsMenu implements Screen {
     @Override
     public void dispose() {
         stage.dispose();
-        skin.dispose();
     }
 }

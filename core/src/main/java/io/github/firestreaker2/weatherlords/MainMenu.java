@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -18,26 +17,24 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 public class MainMenu implements Screen {
     final Weatherlords game;
     private final Stage stage;
-    private final Skin skin;
 
     public MainMenu(final Weatherlords game) {
         this.game = game;
 
         stage = new Stage(new FitViewport(800, 480), game.batch);
         Gdx.input.setInputProcessor(stage);
-        skin = new Skin(Gdx.files.internal("uiskin.json"));
 
         // TODO: clean up code :3 (dynamic)
-        Label title = new Label("WEATHERLORDS", skin);
-        title.setColor(Color.WHITE);
-        title.setFontScale(2);
+        Label title = new Label("WEATHERLORDS", game.labelStyle);
+        title.setColor(Color.BLACK);
         title.pack();
         title.setPosition(stage.getWidth() / 2 - title.getWidth() / 2, 400);
 
-        TextButton startButton = new TextButton("START", skin);
-        TextButton settingsButton = new TextButton("SETTINGS", skin);
-        TextButton creditsButton = new TextButton("CREDITS", skin);
-        TextButton quitButton = new TextButton("QUIT", skin);
+        // buttons
+        TextButton startButton = new TextButton("START", game.skin);
+        TextButton settingsButton = new TextButton("SETTINGS", game.skin);
+        TextButton creditsButton = new TextButton("CREDITS", game.skin);
+        TextButton quitButton = new TextButton("QUIT", game.skin);
 
         startButton.setSize(200, 60);
         startButton.setPosition(300, 300);
@@ -51,6 +48,7 @@ public class MainMenu implements Screen {
         quitButton.setSize(200, 60);
         quitButton.setPosition(300, 60);
 
+        // html vibes
         startButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -91,7 +89,7 @@ public class MainMenu implements Screen {
 
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(Color.BLACK);
+        ScreenUtils.clear(Color.WHITE);
 
         stage.act(delta);
         stage.draw();
@@ -121,6 +119,5 @@ public class MainMenu implements Screen {
     @Override
     public void dispose() {
         stage.dispose();
-        skin.dispose();
     }
 }
