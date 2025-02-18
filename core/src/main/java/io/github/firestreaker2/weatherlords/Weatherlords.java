@@ -31,6 +31,8 @@ public class Weatherlords extends Game {
     public Label.LabelStyle labelStyle;
     public TextButton.TextButtonStyle textButtonStyle;
 
+    // TODO: make more shared config + global mutator method
+
     public void create() {
         batch = new SpriteBatch();
         viewport = new FitViewport(8, 5);

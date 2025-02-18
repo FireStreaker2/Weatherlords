@@ -6,12 +6,13 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.ScreenUtils;
+
+import io.github.firestreaker2.weatherlords.settings.GraphicsMenu;
 
 public class SettingsMenu implements Screen {
     final Weatherlords game;
@@ -37,13 +38,13 @@ public class SettingsMenu implements Screen {
 
         for (TextButton button : buttons) {
             button.setSize(200, 60);
-//            button.addListener(new ClickListener() {
-//                @Override
-//                public void clicked(InputEvent event, float x, float y) {
-//                    game.setScreen();
-//                    dispose();
-//                }
-//            });
+            button.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    game.setScreen(new GraphicsMenu(game)); // TODO: make dynamic + make separate pages for all
+                    dispose();
+                }
+            });
         }
 
         graphicsButton.setPosition(100, 175);
