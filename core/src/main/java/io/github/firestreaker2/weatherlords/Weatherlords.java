@@ -15,11 +15,15 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
+import java.util.EnumMap;
+
 /**
  * main handler for game
  * invokes main menu
  */
 public class Weatherlords extends Game {
+    // actual game config
+    private final EnumMap<Config, String> config = new EnumMap<>(Config.class); // TODO: actually use config in gameplay
     /**
      * universal config
      * access via `game.<config>`
@@ -30,8 +34,6 @@ public class Weatherlords extends Game {
     public Skin skin;
     public Label.LabelStyle labelStyle;
     public TextButton.TextButtonStyle textButtonStyle;
-
-    // TODO: make more shared config + global mutator method
 
     public void create() {
         batch = new SpriteBatch();
@@ -47,7 +49,7 @@ public class Weatherlords extends Game {
         font.setUseIntegerPositions(false);
 
         // shared skin
-        skin = new Skin();
+        skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
         skin.add("default-font", font);
         // use `linear` for clean, `nearest` for pixelated
         skin.getFont("default-font").getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
@@ -68,7 +70,35 @@ public class Weatherlords extends Game {
 
         skin.add("default", textButtonStyle);
 
+        // init default game config
+        config.put(Config.UP, "w");
+        config.put(Config.LEFT, "a");
+        config.put(Config.DOWN, "s");
+        config.put(Config.RIGHT, "d");
+        config.put(Config.VOLUME, "1"); // 0f-1f
+        config.put(Config.FOV, "1"); // 0f-2f
+
         this.setScreen(new MainMenu(this));
+    }
+
+    /**
+     * getConfig
+     *
+     * @param key
+     * @return
+     */
+    public String getConfig(Config key) {
+        return config.getOrDefault(key, "");
+    }
+
+    /**
+     * editConfig
+     *
+     * @param key
+     * @param value
+     */
+    public void editConfig(Config key, String value) {
+        if (config.containsKey(key)) config.put(key, value);
     }
 
     public void render() {
@@ -78,5 +108,10 @@ public class Weatherlords extends Game {
     public void dispose() {
         batch.dispose();
         font.dispose();
+    }
+
+    // global config enum
+    public enum Config {
+        UP, DOWN, LEFT, RIGHT, VOLUME, FOV
     }
 }

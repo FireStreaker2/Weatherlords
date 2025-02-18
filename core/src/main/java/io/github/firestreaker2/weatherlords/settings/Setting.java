@@ -4,10 +4,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -25,6 +28,7 @@ public abstract class Setting implements Screen {
 
     /**
      * Setting constructor
+     *
      * @param game
      */
     public Setting(final Weatherlords game) {
@@ -39,15 +43,13 @@ public abstract class Setting implements Screen {
 
     /**
      * createButton
+     *
      * @param label
      * @param x
      * @param y
-     * @param action
-     * @return
-     *
-     * easily make a new textbutton
+     * @param action easily make a new textbutton
      */
-    protected TextButton createButton(String label, float x, float y, Runnable action) {
+    protected void createButton(String label, float x, float y, Runnable action) {
         TextButton button = new TextButton(label, game.skin);
         button.setSize(200, 60);
         button.setPosition(x, y);
@@ -58,25 +60,66 @@ public abstract class Setting implements Screen {
             }
         });
 
+        stage.addActor(button);
+    }
+
+    /**
+     * createRebindButton
+     * <p>
+     * manual version for rebind buttons
+     * so i can reference obj to change text
+     * </p>
+     *
+     * @param label
+     * @param x
+     * @param y
+     * @return
+     */
+    protected TextButton createButtonManual(String label, float x, float y) {
+        TextButton button = new TextButton(label, game.skin);
+        button.setSize(200, 60);
+        button.setPosition(x, y);
+
         return button;
     }
 
     /**
      * createLabel
-     * @param title
-     * @return
      *
-     * easily make a label
-     * auto positions in title area
+     * @param title easily make a label
+     *              auto positions in title area
      */
-    protected Label createLabel(String title) {
+    protected void createLabel(String title) {
         Label label = new Label(title, game.labelStyle);
         label.setColor(Color.BLACK);
         label.pack();
         // settings pages really only need 1 label and in this position
         label.setPosition(stage.getWidth() / 2 - label.getWidth() / 2, 400);
 
-        return label;
+        stage.addActor(label);
+    }
+
+    /**
+     * createSlider
+     *
+     * @param min
+     * @param max
+     * @param step
+     * @param config
+     */
+    protected void createSlider(float x, float y, float min, float max, float step, Weatherlords.Config config) {
+        Slider slider = new Slider(min, max, step, false, game.skin);
+        slider.setValue(Float.parseFloat(game.getConfig(config)));
+        slider.setPosition(x, y);
+        slider.setSize(200, 100);
+        slider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                game.editConfig(config, slider.getValue() + "");
+            }
+        });
+
+        stage.addActor(slider);
     }
 
     @Override
