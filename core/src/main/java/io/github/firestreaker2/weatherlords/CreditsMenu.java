@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.ScreenUtils;
 
+// TODO: finish after everything else
 public class CreditsMenu implements Screen {
     final Weatherlords game;
 

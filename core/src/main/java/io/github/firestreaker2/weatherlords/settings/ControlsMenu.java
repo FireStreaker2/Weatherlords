@@ -6,14 +6,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import io.github.firestreaker2.weatherlords.SettingsMenu;
 import io.github.firestreaker2.weatherlords.Weatherlords;
 
-public class GraphicsMenu extends Setting {
-    public GraphicsMenu(Weatherlords game) {
+public class ControlsMenu extends Setting {
+    public ControlsMenu(Weatherlords game) {
         super(game);
     }
 
     @Override
     protected void content() {
-        Label title = createLabel("GRAPHICS");
+        Label title = createLabel("CONTROLS");
         TextButton doneButton = createButton("DONE", stage.getWidth() / 2 - 100, 60, () -> {
             game.setScreen(new SettingsMenu(game));
         });
