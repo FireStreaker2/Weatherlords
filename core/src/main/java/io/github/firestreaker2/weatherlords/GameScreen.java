@@ -2,32 +2,74 @@ package io.github.firestreaker2.weatherlords;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 
-/**
- * actual game class
- * contains all logic for game
- */
-public class GameScreen implements Screen {
+public class GameScreen extends InputAdapter implements Screen {
     final Weatherlords game;
 
     Texture pfp;
+
     Vector2 touchPos;
+    SpriteBatch spriteBatch;
+
     Sprite guraSprite;
+
+    TiledMap tiledMap;
+    OrthogonalTiledMapRenderer tiledMapRenderer;
+    OrthographicCamera camera;
+
+    int guraXInTiles;
+
+    int guraYInTiles;
+
+    boolean isColliding = false;
+
 
     public GameScreen(final Weatherlords game) {
         this.game = game;
 
+        Gdx.input.setInputProcessor(this);
+
         touchPos = new Vector2();
         pfp = new Texture("Selector.png");
 
+        spriteBatch = new SpriteBatch();
         guraSprite = new Sprite(pfp);
         guraSprite.setSize(1, 1);
+        camera = new OrthographicCamera();
+        game.viewport = new FitViewport(10, 10);
+        camera.setToOrtho(false, 10, 10);
+
+
+        float unitScale = 1 / 16f;
+        tiledMap = new TmxMapLoader().load("WorldMap.tmx");
+        tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap, unitScale);
+        MapLayer layers = tiledMap.getLayers().get("SpawnLayer");
+        MapObject objectSpawn = layers.getObjects().get("SpawnPoint");
+        float x = objectSpawn.getProperties().get("x", Float.class);
+        float y = objectSpawn.getProperties().get("y", Float.class);
+
+        guraXInTiles = (int) (x / 16);
+        guraYInTiles = (int) (y / 16);
+
+        camera.translate(x / 16f, y);
     }
 
     private void clampCameraPosition() {
@@ -50,14 +92,14 @@ public class GameScreen implements Screen {
     }
 
 
+    @Override
+    public void show() {
+    }
 
     @Override
     public void resize(final int width, final int height) {
         game.viewport.update(width, height, true);
-    }
-
-    @Override
-    public void show() {
+        camera.update();
     }
 
     @Override
@@ -69,30 +111,144 @@ public class GameScreen implements Screen {
 
     private void input() {
         TiledMapTileLayer layer = (TiledMapTileLayer) tiledMap.getLayers().get(0);
-        float tileWidth = layer.getTileWidth()  * 1 / 16f;
-        float tileHeight = layer.getTileHeight() * 1 / 16f;
+        float tileWidth = layer.getTileWidth() / 16f;
+        float tileHeight = layer.getTileHeight() / 16f;
         TiledMapTileLayer collisionLayer = (TiledMapTileLayer) tiledMap.getLayers().get("Background");
         float minX = 0;
         float minY = 0;
-        float maxX = viewport.getWorldWidth() - guraSprite.getWidth();
-        float maxY = viewport.getWorldHeight() - guraSprite.getHeight();
+        float maxX = game.viewport.getWorldWidth() - guraSprite.getWidth();
+        float maxY = game.viewport.getWorldHeight() - guraSprite.getHeight();
 
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            guraSprite.translateY(speed * delta);
+        if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+            isColliding = false;
+
+            // Calculates the position of the next tile
+            int guraNextYInTiles = guraYInTiles + 1;
+            if (guraNextYInTiles > 99) {
+                guraNextYInTiles = 99;
+            }
+            TiledMapTile nextTile = collisionLayer.getCell(guraXInTiles, guraNextYInTiles).getTile();
+            if (nextTile.getProperties().containsKey("isSolid")) {
+                isColliding = nextTile.getProperties().get("isSolid", Boolean.class);
+            }
+
+            // Checks for collision before moving
+            if (!isColliding) {
+                guraSprite.translateY(tileHeight);
+                guraYInTiles += 1;
+                if (guraYInTiles > 99) {
+                    guraYInTiles = 99;
+                }
+            }
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            guraSprite.translateY(-speed * delta);
+        if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
+            isColliding = false;
+
+            // Calculates the position of the next tile
+            int guraNextYInTiles = guraYInTiles - 1;
+            if (guraNextYInTiles < 0) {
+                guraNextYInTiles = 0;
+            }
+            TiledMapTile nextTile = collisionLayer.getCell(guraXInTiles, guraNextYInTiles).getTile();
+            if (nextTile.getProperties().containsKey("isSolid")) {
+                isColliding = nextTile.getProperties().get("isSolid", Boolean.class);
+            }
+
+            // Checks for collision before moving
+            if (!isColliding) {
+                guraSprite.translateY(-tileHeight);
+                guraYInTiles -= 1;
+                if (guraYInTiles < 0) {
+                    guraYInTiles = 0;
+                }
+            }
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            guraSprite.translateX(-speed * delta);
+        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+            isColliding = false;
+            int guraNextXInTiles = guraXInTiles - 1;
+            if (guraNextXInTiles < 0) {
+                guraNextXInTiles = 0;
+            }
+            TiledMapTile nextTile = collisionLayer.getCell(guraNextXInTiles, guraYInTiles).getTile();
+            if (nextTile.getProperties().containsKey("isSolid")) {
+                isColliding = nextTile.getProperties().get("isSolid", Boolean.class);
+            }
+
+            // Checks for collision before moving
+            if (!isColliding) {
+                guraSprite.translateX(-tileWidth);
+                guraXInTiles -= 1;
+                if (guraXInTiles < 0) {
+                    guraXInTiles = 0;
+                }
+            }
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            guraSprite.translateX(speed * delta);
+        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+            isColliding = false;
+            int guraNextXInTiles = guraXInTiles + 1;
+            if (guraNextXInTiles > 99) {
+                guraNextXInTiles = 99;
+            }
+            TiledMapTile nextTile = collisionLayer.getCell(guraNextXInTiles, guraYInTiles).getTile();
+            if (nextTile.getProperties().containsKey("isSolid")) {
+                isColliding = nextTile.getProperties().get("isSolid", Boolean.class);
+            }
+
+            // Checks for collision before moving
+            if (!isColliding) {
+                guraSprite.translateX(tileWidth);
+                guraXInTiles += 1;
+                if (guraXInTiles > 99) {
+                    guraXInTiles = 99;
+                }
+            }
         }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
+            System.out.println("(" + guraXInTiles + ", " + guraYInTiles + ")");
+        }
+
+        // Clamp the sprite to screen bounds
+        guraSprite.setX(MathUtils.clamp(guraSprite.getX(), minX, maxX));
+        guraSprite.setY(MathUtils.clamp(guraSprite.getY(), minY, maxY));
+
+        // Calculate the maximum position of the camera in the world
+        float maxCameraX = (float) ((TiledMapTileLayer) tiledMap.getLayers().get(0)).getWidth() - (camera.viewportWidth / 2);
+        float maxCameraY = (float) ((TiledMapTileLayer) tiledMap.getLayers().get(0)).getHeight() - (camera.viewportHeight / 2);
+
+        // Check if the sprite is within 1 tile of the boundary and move the camera accordingly
+        if (camera.position.y < maxCameraY) {
+            if (guraSprite.getY() >= maxY - tileHeight / 2) {
+                camera.position.y += tileHeight;
+                guraSprite.translateY(-tileHeight);
+            }
+        }
+        if (camera.position.y > (camera.viewportHeight / 2)) {
+            if (guraSprite.getY() <= minY + tileHeight / 2) {
+                camera.position.y -= tileHeight;
+                guraSprite.translateY(tileHeight);
+            }
+        }
+        if (camera.position.x > (camera.viewportWidth / 2)) {
+            if (guraSprite.getX() <= minX + tileWidth / 2) {
+                camera.position.x -= tileWidth;
+                guraSprite.translateX(tileWidth);
+            }
+        }
+        if (camera.position.x < maxCameraX) {
+            if (guraSprite.getX() >= maxX - tileWidth / 2) {
+                camera.position.x += tileWidth;
+                guraSprite.translateX(-tileWidth);
+            }
+        }
+
         if (Gdx.input.isTouched()) {
             touchPos.set(Gdx.input.getX(), Gdx.input.getY());
             game.viewport.unproject(touchPos);
-            guraSprite.setCenter(touchPos.x, touchPos.y);
+
+            // Make sure the sprite stays within bounds when using touch
+            float clampedX = MathUtils.clamp(touchPos.x - guraSprite.getWidth() / 2, minX, maxX);
+            float clampedY = MathUtils.clamp(touchPos.y - guraSprite.getHeight() / 2, minY, maxY);
+            guraSprite.setPosition(clampedX, clampedY);
         }
 
         // Update camera position if needed
@@ -100,17 +256,25 @@ public class GameScreen implements Screen {
     }
 
     private void logic() {
+
     }
 
     private void draw() {
         ScreenUtils.clear(Color.BLACK);
+
+        // Update camera and set view for map renderer
+        camera.update();
+        tiledMapRenderer.setView(camera);
+
+        // Render the map
+        tiledMapRenderer.render();
         game.viewport.apply();
-        game.batch.setProjectionMatrix((game.viewport.getCamera().combined));
-        game.batch.begin();
+        spriteBatch.setProjectionMatrix((game.viewport.getCamera().combined));
+        spriteBatch.begin();
 
-        guraSprite.draw(game.batch);
+        guraSprite.draw(spriteBatch);
 
-        game.batch.end();
+        spriteBatch.end();
     }
 
     @Override
@@ -123,9 +287,12 @@ public class GameScreen implements Screen {
 
     @Override
     public void hide() {
+
     }
 
     @Override
     public void dispose() {
     }
+
+    // Note: you can override methods from InputAdapter API to handle user's input.
 }
