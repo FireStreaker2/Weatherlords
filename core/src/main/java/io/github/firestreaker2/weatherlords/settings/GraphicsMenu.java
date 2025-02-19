@@ -1,6 +1,5 @@
 package io.github.firestreaker2.weatherlords.settings;
 
-import io.github.firestreaker2.weatherlords.SettingsMenu;
 import io.github.firestreaker2.weatherlords.Weatherlords;
 
 public class GraphicsMenu extends Setting {
@@ -11,8 +10,6 @@ public class GraphicsMenu extends Setting {
     @Override
     protected void content() {
         createLabel("GRAPHICS");
-        createButton("DONE", stage.getWidth() / 2 - 100, 60, () -> {
-            game.setScreen(new SettingsMenu(game));
-        });
+        createButton("DONE", stage.getWidth() / 2 - 100, 60, "SettingsMenu");
     }
 }

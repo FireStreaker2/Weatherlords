@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-import io.github.firestreaker2.weatherlords.SettingsMenu;
 import io.github.firestreaker2.weatherlords.Weatherlords;
 
 public class ControlsMenu extends Setting {
@@ -27,9 +26,7 @@ public class ControlsMenu extends Setting {
     @Override
     protected void content() {
         createLabel("CONTROLS");
-        createButton("DONE", stage.getWidth() / 2 - 100, 60, () -> {
-            game.setScreen(new SettingsMenu(game));
-        });
+        createButton("DONE", stage.getWidth() / 2 - 100, 60, "SettingsMenu");
 
         // keybinds
         int i = 0;

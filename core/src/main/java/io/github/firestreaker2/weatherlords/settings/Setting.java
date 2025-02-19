@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import io.github.firestreaker2.weatherlords.SettingsMenu;
+import io.github.firestreaker2.weatherlords.Util;
 import io.github.firestreaker2.weatherlords.Weatherlords;
 
 /**
@@ -57,8 +58,28 @@ public abstract class Setting implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 action.run();
+                dispose();
             }
         });
+
+        stage.addActor(button);
+    }
+
+    /**
+     * createButton
+     * <p>
+     * overload for fade
+     *
+     * @param label
+     * @param x
+     * @param y
+     */
+    protected void createButton(String label, float x, float y, String fadeTransition) {
+        TextButton button = new TextButton(label, game.skin);
+        button.setSize(200, 60);
+        button.setPosition(x, y);
+
+        Util.addLowTaperFade(stage, game, button, fadeTransition);
 
         stage.addActor(button);
     }
@@ -100,7 +121,7 @@ public abstract class Setting implements Screen {
 
     /**
      * createLabel
-     *
+     * <p>
      * overload for all the other labels
      *
      * @param title

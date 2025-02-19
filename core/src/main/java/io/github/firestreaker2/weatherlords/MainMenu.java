@@ -20,11 +20,8 @@ public class MainMenu implements Screen {
 
     public MainMenu(final Weatherlords game) {
         this.game = game;
-
         stage = new Stage(new FitViewport(800, 480), game.batch);
-        Gdx.input.setInputProcessor(stage);
 
-        // TODO: clean up code :3 (dynamic)
         Label title = new Label("WEATHERLORDS", game.labelStyle);
         title.setColor(Color.BLACK);
         title.pack();
@@ -49,30 +46,10 @@ public class MainMenu implements Screen {
         quitButton.setPosition(300, 60);
 
         // html vibes
-        startButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new GameScreen(game));
-                dispose();
-            }
-        });
-
-        settingsButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new SettingsMenu(game));
-                dispose();
-            }
-        });
-
-        creditsButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new CreditsMenu(game));
-                dispose();
-            }
-        });
-
+        // TODO: add sounds when buttons are pressed
+        Util.addLowTaperFade(stage, game, startButton, "GameScreen");
+        Util.addLowTaperFade(stage, game, settingsButton, "SettingsMenu");
+        Util.addLowTaperFade(stage, game, creditsButton, "CreditsMenu");
         quitButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -102,6 +79,7 @@ public class MainMenu implements Screen {
 
     @Override
     public void show() {
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
