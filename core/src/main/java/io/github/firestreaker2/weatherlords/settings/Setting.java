@@ -86,15 +86,32 @@ public abstract class Setting implements Screen {
     /**
      * createLabel
      *
-     * @param title easily make a label
-     *              auto positions in title area
+     * @param title
      */
     protected void createLabel(String title) {
         Label label = new Label(title, game.labelStyle);
         label.setColor(Color.BLACK);
         label.pack();
-        // settings pages really only need 1 label and in this position
-        label.setPosition(stage.getWidth() / 2 - label.getWidth() / 2, 400);
+        // settings pages really only need 1 label and in this position aside from some specific ones
+        label.setPosition(stage.getWidth() / 2 - label.getWidth() / 2, 400); // TODO: change
+
+        stage.addActor(label);
+    }
+
+    /**
+     * createLabel
+     *
+     * overload for all the other labels
+     *
+     * @param title
+     * @param x
+     * @param y
+     */
+    protected void createLabel(String title, float x, float y) {
+        Label label = new Label(title, game.labelStyle);
+        label.setColor(Color.BLACK);
+        label.pack();
+        label.setPosition(x, y);
 
         stage.addActor(label);
     }
@@ -108,7 +125,7 @@ public abstract class Setting implements Screen {
      * @param config
      */
     protected void createSlider(float x, float y, float min, float max, float step, Weatherlords.Config config) {
-        Slider slider = new Slider(min, max, step, false, game.skin);
+        Slider slider = new Slider(min, max, step, false, game.skin); // TODO: custom sprite
         slider.setValue(Float.parseFloat(game.getConfig(config)));
         slider.setPosition(x, y);
         slider.setSize(200, 100);

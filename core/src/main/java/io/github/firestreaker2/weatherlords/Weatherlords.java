@@ -23,6 +23,7 @@ import java.util.EnumMap;
  */
 public class Weatherlords extends Game {
     // actual game config
+    // TODO: also store config in separate file to persist through sessions(?)
     private final EnumMap<Config, String> config = new EnumMap<>(Config.class); // TODO: actually use config in gameplay
     /**
      * universal config
@@ -71,10 +72,10 @@ public class Weatherlords extends Game {
         skin.add("default", textButtonStyle);
 
         // init default game config
-        config.put(Config.UP, "w");
-        config.put(Config.LEFT, "a");
-        config.put(Config.DOWN, "s");
-        config.put(Config.RIGHT, "d");
+        config.put(Config.UP, "W");
+        config.put(Config.LEFT, "A");
+        config.put(Config.DOWN, "S");
+        config.put(Config.RIGHT, "D");
         config.put(Config.VOLUME, "1"); // 0f-1f
         config.put(Config.FOV, "1"); // 0f-2f
 

@@ -38,7 +38,7 @@ public class ControlsMenu extends Setting {
             rebind.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    rebind.setText("LISTENING");
+                    rebind.setText("PRESS BUTTON");
                     Gdx.input.setInputProcessor(new InputAdapter() {
                         @Override
                         public boolean keyDown(int keycode) {

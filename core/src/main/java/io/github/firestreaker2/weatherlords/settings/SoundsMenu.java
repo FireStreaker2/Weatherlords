@@ -11,6 +11,8 @@ public class SoundsMenu extends Setting {
     @Override
     protected void content() {
         createLabel("SOUNDS");
+
+        createLabel("VOLUME", stage.getWidth() / 2 - 50, 190);
         createSlider(stage.getWidth() / 2 - 100, 200, 0f, 1f, 0.01f, Weatherlords.Config.VOLUME);
         createButton("DONE", stage.getWidth() / 2 - 100, 60, () -> {
             game.setScreen(new SettingsMenu(game));
