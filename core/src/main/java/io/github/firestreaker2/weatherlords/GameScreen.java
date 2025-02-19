@@ -24,11 +24,32 @@ public class GameScreen implements Screen {
         this.game = game;
 
         touchPos = new Vector2();
-        pfp = new Texture("pfp.png");
+        pfp = new Texture("Selector.png");
 
         guraSprite = new Sprite(pfp);
         guraSprite.setSize(1, 1);
     }
+
+    private void clampCameraPosition() {
+        float cameraHalfWidth = camera.viewportWidth / 2;
+        float cameraHalfHeight = camera.viewportHeight / 2;
+
+        // Get map width and height in tiles
+        int mapWidth = ((TiledMapTileLayer) tiledMap.getLayers().get(0)).getWidth();
+        int mapHeight = ((TiledMapTileLayer) tiledMap.getLayers().get(0)).getHeight();
+
+        // Get map dimensions in world units
+        float mapWidthInUnits = mapWidth; // Tile count along x-axis
+        float mapHeightInUnits = mapHeight; // Tile count along y-axis
+
+        // Clamp camera position to prevent going outside the map bounds
+        camera.position.x = MathUtils.clamp(camera.position.x, cameraHalfWidth, mapWidthInUnits - cameraHalfWidth);
+        camera.position.y = MathUtils.clamp(camera.position.y, cameraHalfHeight, mapHeightInUnits - cameraHalfHeight);
+
+        camera.update();
+    }
+
+
 
     @Override
     public void resize(final int width, final int height) {
@@ -47,8 +68,14 @@ public class GameScreen implements Screen {
     }
 
     private void input() {
-        float speed = 4f;
-        float delta = Gdx.graphics.getDeltaTime();
+        TiledMapTileLayer layer = (TiledMapTileLayer) tiledMap.getLayers().get(0);
+        float tileWidth = layer.getTileWidth()  * 1 / 16f;
+        float tileHeight = layer.getTileHeight() * 1 / 16f;
+        TiledMapTileLayer collisionLayer = (TiledMapTileLayer) tiledMap.getLayers().get("Background");
+        float minX = 0;
+        float minY = 0;
+        float maxX = viewport.getWorldWidth() - guraSprite.getWidth();
+        float maxY = viewport.getWorldHeight() - guraSprite.getHeight();
 
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
             guraSprite.translateY(speed * delta);
@@ -67,6 +94,9 @@ public class GameScreen implements Screen {
             game.viewport.unproject(touchPos);
             guraSprite.setCenter(touchPos.x, touchPos.y);
         }
+
+        // Update camera position if needed
+        clampCameraPosition();
     }
 
     private void logic() {
