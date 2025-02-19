@@ -3,11 +3,10 @@ package io.github.firestreaker2.weatherlords.gwt;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
-import io.github.firestreaker2.weatherlords.Main;
+import io.github.firestreaker2.weatherlords.GameScreen;
 
 /** Launches the GWT application. */
-public class GwtLauncher extends GwtApplication {
-        @Override
+public class GwtLauncher {
         public GwtApplicationConfiguration getConfig () {
             // Resizable application, uses available space in browser with no padding:
             GwtApplicationConfiguration cfg = new GwtApplicationConfiguration(true);
@@ -17,10 +16,5 @@ public class GwtLauncher extends GwtApplication {
             // If you want a fixed size application, comment out the above resizable section,
             // and uncomment below:
             //return new GwtApplicationConfiguration(640, 480);
-        }
-
-        @Override
-        public ApplicationListener createApplicationListener () {
-            return new Main();
         }
 }
