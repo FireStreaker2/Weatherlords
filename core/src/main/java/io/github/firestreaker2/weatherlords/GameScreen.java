@@ -29,6 +29,7 @@ public class GameScreen implements Screen {
         guraSprite = new Sprite(pfp);
         guraSprite.setSize(1, 1);
     }
+
     private void clampCameraPosition() {
         float cameraHalfWidth = camera.viewportWidth / 2;
         float cameraHalfHeight = camera.viewportHeight / 2;
@@ -47,6 +48,7 @@ public class GameScreen implements Screen {
 
         camera.update();
     }
+
 
 
     @Override
