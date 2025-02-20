@@ -25,11 +25,15 @@ public class GameScreen extends InputAdapter implements Screen {
     final Weatherlords game;
 
     Texture pfp;
+    Texture sideUITexture;
 
     Vector2 touchPos;
     SpriteBatch spriteBatch;
 
     Sprite guraSprite;
+
+    Sprite sideUI;
+    Sprite bottomUI;
 
     TiledMap tiledMap;
     OrthogonalTiledMapRenderer tiledMapRenderer;
@@ -49,14 +53,20 @@ public class GameScreen extends InputAdapter implements Screen {
 
         touchPos = new Vector2();
         pfp = new Texture("Selector.png");
+        sideUITexture = new Texture("SideUI.png");
 
         spriteBatch = new SpriteBatch();
         guraSprite = new Sprite(pfp);
         guraSprite.setSize(1, 1);
-        camera = new OrthographicCamera();
-        game.viewport = new FitViewport(14, 10);
-        camera.setToOrtho(false, 14, 10);
+        sideUI = new Sprite(sideUITexture);
+        bottomUI = new Sprite(sideUITexture);
+        sideUI.setSize(2, 10);
+        bottomUI.setSize(18, 2);
 
+        camera = new OrthographicCamera();
+        game.viewport = new FitViewport(18, 12);
+        camera.setToOrtho(false, 18, 12);
+        sideUI.setPosition(camera.viewportWidth - 2, 2);
 
         float unitScale = 1 / 16f;
         tiledMap = new TmxMapLoader().load("WorldMap.tmx");
@@ -67,7 +77,7 @@ public class GameScreen extends InputAdapter implements Screen {
         float y = objectSpawn.getProperties().get("y", Float.class);
 
         guraXInTiles = (int) (x / 16);
-        guraYInTiles = (int) (y / 16);
+        guraYInTiles = (int) (y / 16 - 2);
 
         camera.translate(x / 16f, y);
     }
@@ -228,7 +238,7 @@ public class GameScreen extends InputAdapter implements Screen {
             }
         }
         if (camera.position.y > (camera.viewportHeight / 2)) {
-            if (guraSprite.getY() <= minY + tileHeight / 2) {
+            if (guraSprite.getY() <= minY + tileHeight * 2) {
                 camera.position.y -= tileHeight;
                 guraSprite.translateY(tileHeight);
             }
@@ -240,7 +250,7 @@ public class GameScreen extends InputAdapter implements Screen {
             }
         }
         if (camera.position.x < maxCameraX) {
-            if (guraSprite.getX() >= maxX - tileWidth / 2) {
+            if (guraSprite.getX() >= maxX - tileWidth * 2) {
                 camera.position.x += tileWidth;
                 guraSprite.translateX(-tileWidth);
             }
@@ -264,6 +274,8 @@ public class GameScreen extends InputAdapter implements Screen {
         spriteBatch.begin();
 
         guraSprite.draw(spriteBatch);
+        sideUI.draw(spriteBatch);
+        bottomUI.draw(spriteBatch);
 
         spriteBatch.end();
     }
