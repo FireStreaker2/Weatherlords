@@ -105,8 +105,13 @@ public class GameScreen extends InputAdapter implements Screen {
     @Override
     public void render(float delta) {
         input();
-        logic();
         draw();
+
+        // escape keybind
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            game.setScreen(new MainMenu(game)); // TODO: save progress, replace with popup modals
+            dispose();
+        }
     }
 
     private void input() {
@@ -119,7 +124,7 @@ public class GameScreen extends InputAdapter implements Screen {
         float maxX = game.viewport.getWorldWidth() - guraSprite.getWidth();
         float maxY = game.viewport.getWorldHeight() - guraSprite.getHeight();
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+        if (Gdx.input.isKeyJustPressed(Util.getKey(game.getConfig(Weatherlords.Config.UP)))) {
             isColliding = false;
 
             // Calculates the position of the next tile
@@ -141,7 +146,7 @@ public class GameScreen extends InputAdapter implements Screen {
                 }
             }
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
+        if (Gdx.input.isKeyJustPressed(Util.getKey(game.getConfig(Weatherlords.Config.DOWN)))) {
             isColliding = false;
 
             // Calculates the position of the next tile
@@ -163,7 +168,7 @@ public class GameScreen extends InputAdapter implements Screen {
                 }
             }
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+        if (Gdx.input.isKeyJustPressed(Util.getKey(game.getConfig(Weatherlords.Config.LEFT)))) {
             isColliding = false;
             int guraNextXInTiles = guraXInTiles - 1;
             if (guraNextXInTiles < 0) {
@@ -183,7 +188,7 @@ public class GameScreen extends InputAdapter implements Screen {
                 }
             }
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+        if (Gdx.input.isKeyJustPressed(Util.getKey(game.getConfig(Weatherlords.Config.RIGHT)))) {
             isColliding = false;
             int guraNextXInTiles = guraXInTiles + 1;
             if (guraNextXInTiles > 99) {
@@ -241,22 +246,8 @@ public class GameScreen extends InputAdapter implements Screen {
             }
         }
 
-        if (Gdx.input.isTouched()) {
-            touchPos.set(Gdx.input.getX(), Gdx.input.getY());
-            game.viewport.unproject(touchPos);
-
-            // Make sure the sprite stays within bounds when using touch
-            float clampedX = MathUtils.clamp(touchPos.x - guraSprite.getWidth() / 2, minX, maxX);
-            float clampedY = MathUtils.clamp(touchPos.y - guraSprite.getHeight() / 2, minY, maxY);
-            guraSprite.setPosition(clampedX, clampedY);
-        }
-
         // Update camera position if needed
         clampCameraPosition();
-    }
-
-    private void logic() {
-
     }
 
     private void draw() {
@@ -287,12 +278,9 @@ public class GameScreen extends InputAdapter implements Screen {
 
     @Override
     public void hide() {
-
     }
 
     @Override
     public void dispose() {
     }
-
-    // Note: you can override methods from InputAdapter API to handle user's input.
 }

@@ -1,5 +1,6 @@
 package io.github.firestreaker2.weatherlords;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -76,4 +77,19 @@ public class Util {
                 throw new IllegalArgumentException("Unknown screen: " + screenName);
         }
     }
+
+    /**
+     * getKey
+     *
+     * @param key
+     * @return
+     */
+    public static int getKey(String key) {
+        try {
+            return (int) Input.Keys.class.getField(key.toUpperCase()).get(null);
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
 }

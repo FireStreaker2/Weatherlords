@@ -81,6 +81,7 @@ public class Weatherlords extends Game {
         config.put(Config.LEFT, "A");
         config.put(Config.DOWN, "S");
         config.put(Config.RIGHT, "D");
+        config.put(Config.INTERACT, "SPACE");
         config.put(Config.VOLUME, "1"); // 0f-1f
         config.put(Config.FOV, "1"); // 0f-2f
 
@@ -118,6 +119,6 @@ public class Weatherlords extends Game {
 
     // global config enum
     public enum Config {
-        UP, DOWN, LEFT, RIGHT, VOLUME, FOV
+        UP, DOWN, LEFT, RIGHT, INTERACT, VOLUME, FOV
     }
 }
