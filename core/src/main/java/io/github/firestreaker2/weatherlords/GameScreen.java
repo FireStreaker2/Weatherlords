@@ -54,8 +54,8 @@ public class GameScreen extends InputAdapter implements Screen {
         guraSprite = new Sprite(pfp);
         guraSprite.setSize(1, 1);
         camera = new OrthographicCamera();
-        game.viewport = new FitViewport(10, 10);
-        camera.setToOrtho(false, 10, 10);
+        game.viewport = new FitViewport(14, 10);
+        camera.setToOrtho(false, 14, 10);
 
 
         float unitScale = 1 / 16f;
