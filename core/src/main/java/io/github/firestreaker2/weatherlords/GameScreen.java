@@ -21,30 +21,26 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GameScreen extends InputAdapter implements Screen {
     final Weatherlords game;
+    final List<String> logs = new ArrayList<>();
 
     Texture pfp;
     Texture sideUITexture;
-
     Vector2 touchPos;
     SpriteBatch spriteBatch;
-
     Sprite guraSprite;
-
     Sprite sideUI;
     Sprite bottomUI;
-
     TiledMap tiledMap;
     OrthogonalTiledMapRenderer tiledMapRenderer;
     OrthographicCamera camera;
-
     int guraXInTiles;
-
     int guraYInTiles;
-
     boolean isColliding = false;
-
 
     public GameScreen(final Weatherlords game) {
         this.game = game;
@@ -114,8 +110,8 @@ public class GameScreen extends InputAdapter implements Screen {
 
     @Override
     public void render(float delta) {
-        input();
         draw();
+        input();
 
         // escape keybind
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
@@ -136,6 +132,8 @@ public class GameScreen extends InputAdapter implements Screen {
 
         if (Gdx.input.isKeyJustPressed(Util.getKey(game.getConfig(Weatherlords.Config.UP)))) {
             isColliding = false;
+
+            logs.add(game.getConfig(Weatherlords.Config.UP));
 
             // Calculates the position of the next tile
             int guraNextYInTiles = guraYInTiles + 1;
@@ -159,6 +157,8 @@ public class GameScreen extends InputAdapter implements Screen {
         if (Gdx.input.isKeyJustPressed(Util.getKey(game.getConfig(Weatherlords.Config.DOWN)))) {
             isColliding = false;
 
+            logs.add(game.getConfig(Weatherlords.Config.DOWN));
+
             // Calculates the position of the next tile
             int guraNextYInTiles = guraYInTiles - 1;
             if (guraNextYInTiles < 0) {
@@ -180,6 +180,9 @@ public class GameScreen extends InputAdapter implements Screen {
         }
         if (Gdx.input.isKeyJustPressed(Util.getKey(game.getConfig(Weatherlords.Config.LEFT)))) {
             isColliding = false;
+
+            logs.add(game.getConfig(Weatherlords.Config.LEFT));
+
             int guraNextXInTiles = guraXInTiles - 1;
             if (guraNextXInTiles < 0) {
                 guraNextXInTiles = 0;
@@ -200,6 +203,9 @@ public class GameScreen extends InputAdapter implements Screen {
         }
         if (Gdx.input.isKeyJustPressed(Util.getKey(game.getConfig(Weatherlords.Config.RIGHT)))) {
             isColliding = false;
+
+            logs.add(game.getConfig(Weatherlords.Config.RIGHT));
+
             int guraNextXInTiles = guraXInTiles + 1;
             if (guraNextXInTiles > 99) {
                 guraNextXInTiles = 99;
@@ -218,9 +224,9 @@ public class GameScreen extends InputAdapter implements Screen {
                 }
             }
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.I))
             System.out.println("(" + guraXInTiles + ", " + guraYInTiles + ")");
-        }
+
 
         // Clamp the sprite to screen bounds
         guraSprite.setX(MathUtils.clamp(guraSprite.getX(), minX, maxX));
@@ -277,6 +283,15 @@ public class GameScreen extends InputAdapter implements Screen {
         sideUI.draw(spriteBatch);
         bottomUI.draw(spriteBatch);
 
+        // logs
+        if (logs.size() > 3) logs.remove(0);
+
+        float y = 0.75f;
+        for (int i = logs.size() - 1; i >= 0; i--) {
+            game.gameFont.draw(spriteBatch, logs.get(i), 1f, y);
+            y += 0.6f;
+        }
+
         spriteBatch.end();
     }
 
@@ -294,5 +309,6 @@ public class GameScreen extends InputAdapter implements Screen {
 
     @Override
     public void dispose() {
+        game.gameFont.dispose();
     }
 }
