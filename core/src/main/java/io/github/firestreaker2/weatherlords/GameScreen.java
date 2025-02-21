@@ -21,35 +21,41 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GameScreen extends InputAdapter implements Screen {
     final Weatherlords game;
+    final List<String> logs = new ArrayList<>();
+    final List<String> weather = new ArrayList<>();
+
+    float elapsed = 0;
+    int day = 0;
 
     Texture pfp;
     Texture sideUITexture;
-
     Vector2 touchPos;
     SpriteBatch spriteBatch;
-
     Sprite guraSprite;
-
     Sprite sideUI;
     Sprite bottomUI;
-
     TiledMap tiledMap;
     OrthogonalTiledMapRenderer tiledMapRenderer;
     OrthographicCamera camera;
-
     int guraXInTiles;
-
     int guraYInTiles;
-
     boolean isColliding = false;
 
+    int currency = 100;
 
     public GameScreen(final Weatherlords game) {
         this.game = game;
 
         Gdx.input.setInputProcessor(this);
+
+        String[] events = {"Sunny", "Rainy", "Tornado", "Drought", "Snowy", "Icy"};
+        // pre-generate all weather events
+        for (int i = 0; i < 30; i++) weather.add(events[(int) (Math.random() * events.length)]);
 
         touchPos = new Vector2();
         pfp = new Texture("Selector.png");
@@ -114,14 +120,25 @@ public class GameScreen extends InputAdapter implements Screen {
 
     @Override
     public void render(float delta) {
-        input();
-        logic();
+        elapsed += delta;
+
+        if (elapsed >= 5f) {
+            day++;
+            elapsed = 0;
+
+            // restart weather at the end
+            if (day == 29) day = 0;
+
+            if (weather.get(day).equals(weather.get(day - 1))) logs.add("New day!");
+            else logs.add("New day! Weather: " + weather.get(day));
+        }
+
         draw();
+        input();
 
         // escape keybind
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             game.setScreen(new MainMenu(game)); // TODO: save progress, replace with popup modals
-            dispose();
         }
     }
 
@@ -137,6 +154,8 @@ public class GameScreen extends InputAdapter implements Screen {
 
         if (Gdx.input.isKeyJustPressed(Util.getKey(game.getConfig(Weatherlords.Config.UP)))) {
             isColliding = false;
+
+            logs.add(game.getConfig(Weatherlords.Config.UP));
 
             // Calculates the position of the next tile
             int guraNextYInTiles = guraYInTiles + 1;
@@ -160,6 +179,8 @@ public class GameScreen extends InputAdapter implements Screen {
         if (Gdx.input.isKeyJustPressed(Util.getKey(game.getConfig(Weatherlords.Config.DOWN)))) {
             isColliding = false;
 
+            logs.add(game.getConfig(Weatherlords.Config.DOWN));
+
             // Calculates the position of the next tile
             int guraNextYInTiles = guraYInTiles - 1;
             if (guraNextYInTiles < 0) {
@@ -181,6 +202,9 @@ public class GameScreen extends InputAdapter implements Screen {
         }
         if (Gdx.input.isKeyJustPressed(Util.getKey(game.getConfig(Weatherlords.Config.LEFT)))) {
             isColliding = false;
+
+            logs.add(game.getConfig(Weatherlords.Config.LEFT));
+
             int guraNextXInTiles = guraXInTiles - 1;
             if (guraNextXInTiles < 0) {
                 guraNextXInTiles = 0;
@@ -201,6 +225,9 @@ public class GameScreen extends InputAdapter implements Screen {
         }
         if (Gdx.input.isKeyJustPressed(Util.getKey(game.getConfig(Weatherlords.Config.RIGHT)))) {
             isColliding = false;
+
+            logs.add(game.getConfig(Weatherlords.Config.RIGHT));
+
             int guraNextXInTiles = guraXInTiles + 1;
             if (guraNextXInTiles > 99) {
                 guraNextXInTiles = 99;
@@ -219,9 +246,29 @@ public class GameScreen extends InputAdapter implements Screen {
                 }
             }
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
-            System.out.println("(" + guraXInTiles + ", " + guraYInTiles + ")");
+        if (Gdx.input.isKeyJustPressed(Util.getKey(game.getConfig(Weatherlords.Config.TOUCH)))) {
+            TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
+            TiledMapTileLayer.Cell belowCell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles - 1);
+
+            if (cell != null) {
+                int id = cell.getTile().getId();
+                int belowId = belowCell.getTile().getId();
+
+                if (id >= 11 && id <= 27 && currency >= 10) {
+                    currency -= 10;
+                    cell.setTile(tiledMap.getTileSets().getTile(3));
+                    logs.add("Removed obstacle: -10");
+                } else if (id >= 1 && id <= 5 && belowId >= 1 && belowId <= 5 && currency >= 20) {
+                    currency -= 20;
+                    cell.setTile(tiledMap.getTileSets().getTile(24));
+                    belowCell.setTile(tiledMap.getTileSets().getTile(25));
+                    logs.add("Placed house! -20");
+                } else logs.add("Unable to interact");
+            }
         }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.I))
+            System.out.println("(" + guraXInTiles + ", " + guraYInTiles + ")");
+
 
         // Clamp the sprite to screen bounds
         guraSprite.setX(MathUtils.clamp(guraSprite.getX(), minX, maxX));
@@ -277,6 +324,15 @@ public class GameScreen extends InputAdapter implements Screen {
         guraSprite.draw(spriteBatch);
         sideUI.draw(spriteBatch);
         bottomUI.draw(spriteBatch);
+
+        // logs
+        if (logs.size() > 3) logs.remove(0);
+
+        float y = 0.75f;
+        for (int i = logs.size() - 1; i >= 0; i--) {
+            game.gameFont.draw(spriteBatch, logs.get(i), 1f, y);
+            y += 0.6f;
+        }
 
         spriteBatch.end();
     }

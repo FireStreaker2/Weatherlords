@@ -17,8 +17,6 @@ import io.github.firestreaker2.weatherlords.settings.UserInterfaceMenu;
  * util class
  */
 public class Util {
-
-
     /**
      * addLowTaperFade
      * massive transition
@@ -91,5 +89,4 @@ public class Util {
             return -1;
         }
     }
-
 }

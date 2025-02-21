@@ -2,20 +2,15 @@ package io.github.firestreaker2.weatherlords;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -36,6 +31,7 @@ public class Weatherlords extends Game {
      */
     public SpriteBatch batch;
     public BitmapFont font;
+    public BitmapFont gameFont;
     public FitViewport viewport;
     public Skin skin;
     public Label.LabelStyle labelStyle;
@@ -43,7 +39,7 @@ public class Weatherlords extends Game {
 
     public void create() {
         batch = new SpriteBatch();
-        viewport = new FitViewport(8, 5);
+        viewport = new FitViewport(14, 10);
 
         // messy font generator thing
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Cinzel.ttf"));
@@ -51,8 +47,20 @@ public class Weatherlords extends Game {
         parameter.color = Color.WHITE;
         parameter.size = 24;
         font = generator.generateFont(parameter);
+
+        // separate font for gameplay
+        // will only be used as the bitmapfont directly
+        parameter.color = Color.BLACK;
+        parameter.size = 24;
+        parameter.genMipMaps = true;
+        parameter.magFilter = Texture.TextureFilter.Linear;
+        parameter.minFilter = Texture.TextureFilter.Linear;
+        gameFont = generator.generateFont(parameter);
+        gameFont.getData().setScale(1 / 32f);
+
         generator.dispose();
         font.setUseIntegerPositions(false);
+        gameFont.setUseIntegerPositions(false);
 
         // shared skin
         skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
@@ -81,7 +89,7 @@ public class Weatherlords extends Game {
         config.put(Config.LEFT, "A");
         config.put(Config.DOWN, "S");
         config.put(Config.RIGHT, "D");
-        config.put(Config.INTERACT, "SPACE");
+        config.put(Config.TOUCH, "SPACE");
         config.put(Config.VOLUME, "1"); // 0f-1f
         config.put(Config.FOV, "1"); // 0f-2f
 
@@ -119,6 +127,6 @@ public class Weatherlords extends Game {
 
     // global config enum
     public enum Config {
-        UP, DOWN, LEFT, RIGHT, INTERACT, VOLUME, FOV
+        UP, DOWN, LEFT, RIGHT, TOUCH, VOLUME, FOV
     }
 }
