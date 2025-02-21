@@ -93,8 +93,8 @@ public class GameScreen extends InputAdapter implements Screen {
         float cameraHalfHeight = camera.viewportHeight / 2;
 
         // Get map width and height in tiles
-        int mapWidth = ((TiledMapTileLayer) tiledMap.getLayers().get(0)).getWidth();
-        int mapHeight = ((TiledMapTileLayer) tiledMap.getLayers().get(0)).getHeight();
+        int mapWidth = ((TiledMapTileLayer) tiledMap.getLayers().get("Background")).getWidth();
+        int mapHeight = ((TiledMapTileLayer) tiledMap.getLayers().get("Background")).getHeight();
 
         // Get map dimensions in world units
         float mapWidthInUnits = mapWidth; // Tile count along x-axis
@@ -143,7 +143,7 @@ public class GameScreen extends InputAdapter implements Screen {
     }
 
     private void input() {
-        TiledMapTileLayer layer = (TiledMapTileLayer) tiledMap.getLayers().get(0);
+        TiledMapTileLayer layer = (TiledMapTileLayer) tiledMap.getLayers().get("Background");
         float tileWidth = layer.getTileWidth() / 16f;
         float tileHeight = layer.getTileHeight() / 16f;
         TiledMapTileLayer collisionLayer = (TiledMapTileLayer) tiledMap.getLayers().get("Background");
@@ -249,6 +249,9 @@ public class GameScreen extends InputAdapter implements Screen {
         if (Gdx.input.isKeyJustPressed(Util.getKey(game.getConfig(Weatherlords.Config.TOUCH)))) {
             TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
             TiledMapTileLayer.Cell belowCell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles - 1);
+            TiledMapTileLayer farm = ((TiledMapTileLayer) (tiledMap.getLayers().get("farmLayer")));
+            TiledMapTileLayer.Cell farmCell = farm.getCell(0, 1);
+            TiledMapTileLayer.Cell farmCellBelow = farm.getCell(0, 0);
 
             if (cell != null) {
                 int id = cell.getTile().getId();
@@ -260,9 +263,11 @@ public class GameScreen extends InputAdapter implements Screen {
                     logs.add("Removed obstacle: -10");
                 } else if (id >= 1 && id <= 5 && belowId >= 1 && belowId <= 5 && currency >= 20) {
                     currency -= 20;
-                    cell.setTile(tiledMap.getTileSets().getTile(24));
-                    belowCell.setTile(tiledMap.getTileSets().getTile(25));
-                    logs.add("Placed house! -20");
+                    int tileId = farmCell.getTile().getId();
+                    int belowTileId = farmCellBelow.getTile().getId();
+                    cell.setTile(tiledMap.getTileSets().getTile(tileId));
+                    belowCell.setTile(tiledMap.getTileSets().getTile(belowTileId));
+                    logs.add("Placed farm! -20");
                 } else logs.add("Unable to interact");
             }
         }
@@ -275,8 +280,8 @@ public class GameScreen extends InputAdapter implements Screen {
         guraSprite.setY(MathUtils.clamp(guraSprite.getY(), minY, maxY));
 
         // Calculate the maximum position of the camera in the world
-        float maxCameraX = (float) ((TiledMapTileLayer) tiledMap.getLayers().get(0)).getWidth() - (camera.viewportWidth / 2);
-        float maxCameraY = (float) ((TiledMapTileLayer) tiledMap.getLayers().get(0)).getHeight() - (camera.viewportHeight / 2);
+        float maxCameraX = (float) ((TiledMapTileLayer) tiledMap.getLayers().get("Background")).getWidth() - (camera.viewportWidth / 2);
+        float maxCameraY = (float) ((TiledMapTileLayer) tiledMap.getLayers().get("Background")).getHeight() - (camera.viewportHeight / 2);
 
         // Check if the sprite is within 1 tile of the boundary and move the camera accordingly
         if (camera.position.y < maxCameraY) {
