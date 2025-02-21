@@ -46,7 +46,7 @@ public class GameScreen extends InputAdapter implements Screen {
     int guraYInTiles;
     boolean isColliding = false;
 
-    int currency = 0;
+    int currency = 100;
 
     public GameScreen(final Weatherlords game) {
         this.game = game;
@@ -121,7 +121,6 @@ public class GameScreen extends InputAdapter implements Screen {
     @Override
     public void render(float delta) {
         elapsed += delta;
-        System.out.println(delta);
 
         if (elapsed >= 5f) {
             day++;
@@ -246,6 +245,16 @@ public class GameScreen extends InputAdapter implements Screen {
                     guraXInTiles = 99;
                 }
             }
+        }
+        if (Gdx.input.isKeyJustPressed(Util.getKey(game.getConfig(Weatherlords.Config.TOUCH)))) {
+            TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
+
+            if (cell != null && cell.getTile().getId() >= 11 && cell.getTile().getId() <= 27 && currency >= 10) {
+                currency -= 10;
+                cell.setTile(tiledMap.getTileSets().getTile(3));
+                logs.add("Removed obstacle: -10");
+                System.out.println(currency);
+            } else logs.add("Unable to interact");
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.I))
             System.out.println("(" + guraXInTiles + ", " + guraYInTiles + ")");
