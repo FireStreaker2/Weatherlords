@@ -248,13 +248,23 @@ public class GameScreen extends InputAdapter implements Screen {
         }
         if (Gdx.input.isKeyJustPressed(Util.getKey(game.getConfig(Weatherlords.Config.TOUCH)))) {
             TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
+            TiledMapTileLayer.Cell belowCell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles - 1);
 
-            if (cell != null && cell.getTile().getId() >= 11 && cell.getTile().getId() <= 27 && currency >= 10) {
-                currency -= 10;
-                cell.setTile(tiledMap.getTileSets().getTile(3));
-                logs.add("Removed obstacle: -10");
-                System.out.println(currency);
-            } else logs.add("Unable to interact");
+            if (cell != null) {
+                int id = cell.getTile().getId();
+                int belowId = belowCell.getTile().getId();
+
+                if (id >= 11 && id <= 27 && currency >= 10) {
+                    currency -= 10;
+                    cell.setTile(tiledMap.getTileSets().getTile(3));
+                    logs.add("Removed obstacle: -10");
+                } else if (id >= 1 && id <= 5 && belowId >= 1 && belowId <= 5 && currency >= 20) {
+                    currency -= 20;
+                    cell.setTile(tiledMap.getTileSets().getTile(24));
+                    belowCell.setTile(tiledMap.getTileSets().getTile(25));
+                    logs.add("Placed house! -20");
+                } else logs.add("Unable to interact");
+            }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.I))
             System.out.println("(" + guraXInTiles + ", " + guraYInTiles + ")");
