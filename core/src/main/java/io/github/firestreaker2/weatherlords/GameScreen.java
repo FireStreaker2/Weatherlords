@@ -27,6 +27,10 @@ import java.util.List;
 public class GameScreen extends InputAdapter implements Screen {
     final Weatherlords game;
     final List<String> logs = new ArrayList<>();
+    final List<String> weather = new ArrayList<>();
+
+    float elapsed = 0;
+    int day = 0;
 
     Texture pfp;
     Texture sideUITexture;
@@ -42,10 +46,16 @@ public class GameScreen extends InputAdapter implements Screen {
     int guraYInTiles;
     boolean isColliding = false;
 
+    int currency = 0;
+
     public GameScreen(final Weatherlords game) {
         this.game = game;
 
         Gdx.input.setInputProcessor(this);
+
+        String[] events = {"Sunny", "Rainy", "Tornado", "Drought", "Snowy", "Icy"};
+        // pre-generate all weather events
+        for (int i = 0; i < 30; i++) weather.add(events[(int) (Math.random() * events.length)]);
 
         touchPos = new Vector2();
         pfp = new Texture("Selector.png");
@@ -110,13 +120,26 @@ public class GameScreen extends InputAdapter implements Screen {
 
     @Override
     public void render(float delta) {
+        elapsed += delta;
+        System.out.println(delta);
+
+        if (elapsed >= 5f) {
+            day++;
+            elapsed = 0;
+
+            // restart weather at the end
+            if (day == 29) day = 0;
+
+            if (weather.get(day).equals(weather.get(day - 1))) logs.add("New day!");
+            else logs.add("New day! Weather: " + weather.get(day));
+        }
+
         draw();
         input();
 
         // escape keybind
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             game.setScreen(new MainMenu(game)); // TODO: save progress, replace with popup modals
-            dispose();
         }
     }
 
@@ -309,6 +332,5 @@ public class GameScreen extends InputAdapter implements Screen {
 
     @Override
     public void dispose() {
-        game.gameFont.dispose();
     }
 }
