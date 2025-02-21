@@ -11,12 +11,13 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import io.github.firestreaker2.weatherlords.Weatherlords;
 
 public class ControlsMenu extends Setting {
-    private final Weatherlords.Config[] keybinds = {Weatherlords.Config.UP, Weatherlords.Config.DOWN, Weatherlords.Config.LEFT, Weatherlords.Config.RIGHT};
+    private final Weatherlords.Config[] keybinds = {Weatherlords.Config.UP, Weatherlords.Config.DOWN, Weatherlords.Config.LEFT, Weatherlords.Config.RIGHT, Weatherlords.Config.TOUCH};
     private final Vector2[] positions = {
-        new Vector2(100f, 175f),
-        new Vector2(500f, 175f),
+        new Vector2(100f, 200f),
+        new Vector2(500f, 200f),
         new Vector2(100f, 275f),
-        new Vector2(500f, 275f)
+        new Vector2(500f, 275f),
+        new Vector2(300f, 200f)
     };
 
     public ControlsMenu(Weatherlords game) {
@@ -46,7 +47,6 @@ public class ControlsMenu extends Setting {
                             return true;
                         }
                     });
-
                 }
             });
 
