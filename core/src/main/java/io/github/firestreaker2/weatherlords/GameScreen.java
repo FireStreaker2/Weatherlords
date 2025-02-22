@@ -46,7 +46,8 @@ public class GameScreen extends InputAdapter implements Screen {
     int guraYInTiles;
     boolean isColliding = false;
 
-    int currency = 100;
+    int currency = 50;
+    int farms = 0;
 
     public GameScreen(final Weatherlords game) {
         this.game = game;
@@ -86,6 +87,7 @@ public class GameScreen extends InputAdapter implements Screen {
         guraYInTiles = (int) (y / 16 - 2);
 
         camera.translate(x / 16f, y);
+
     }
 
     private void clampCameraPosition() {
@@ -268,6 +270,7 @@ public class GameScreen extends InputAdapter implements Screen {
                     cell.setTile(tiledMap.getTileSets().getTile(tileId));
                     belowCell.setTile(tiledMap.getTileSets().getTile(belowTileId));
                     logs.add("Placed farm! -20");
+                    farms += 1;
                 } else logs.add("Unable to interact");
             }
         }
@@ -339,6 +342,29 @@ public class GameScreen extends InputAdapter implements Screen {
             y += 0.6f;
         }
 
+        String currencyString = Integer.toString(currency);
+        if (currencyString.length() > 4) {
+            String firstCurrencyString = currencyString.substring(0, 4);
+            String secondCurrencyString = currencyString.substring(4);
+            game.sideUIFont.draw(spriteBatch, "$" + firstCurrencyString, sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - 0.5f);
+            game.sideUIFont.draw(spriteBatch, secondCurrencyString, sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - 1f);
+        } else {
+            game.sideUIFont.draw(spriteBatch, "$" + currencyString, sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - 0.5f);
+        }
+        game.sideUIFont.draw(spriteBatch, "Farms:", sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - 2f);
+        game.sideUIFont.draw(spriteBatch, Integer.toString(farms), sideUI.getX() + 0.25f, sideUI.getHeight() + bottomUI.getHeight() - 2.5f);
+        game.sideUIFont.draw(spriteBatch, "Buy:", sideUI.getX() + 0.25f, sideUI.getHeight() + bottomUI.getHeight() - 3f);
+        if (currency >= 20) {
+            game.sideUIFont.draw(spriteBatch, "Yes", sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - 3.5f);
+        } else {
+            game.sideUIFont.draw(spriteBatch, "No", sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - 3.5f);
+        }
+        game.weatherFont.draw(spriteBatch, "Weather:", sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - 4.5f);
+        float sideY = 5f;
+        for (int i = day; i < day + 7; i++) {
+            game.weatherFont.draw(spriteBatch, weather.get(i), sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - sideY);
+            sideY += 0.5f;
+        }
         spriteBatch.end();
     }
 

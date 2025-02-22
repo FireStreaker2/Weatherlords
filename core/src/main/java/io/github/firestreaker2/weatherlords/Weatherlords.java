@@ -32,6 +32,8 @@ public class Weatherlords extends Game {
     public SpriteBatch batch;
     public BitmapFont font;
     public BitmapFont gameFont;
+    public BitmapFont sideUIFont;
+    public BitmapFont weatherFont;
     public FitViewport viewport;
     public Skin skin;
     public Label.LabelStyle labelStyle;
@@ -58,9 +60,29 @@ public class Weatherlords extends Game {
         gameFont = generator.generateFont(parameter);
         gameFont.getData().setScale(1 / 32f);
 
+        // another font for sideUI
+        parameter.color = Color.BLACK;
+        parameter.size = 16;
+        parameter.genMipMaps = true;
+        parameter.magFilter = Texture.TextureFilter.Linear;
+        parameter.minFilter = Texture.TextureFilter.Linear;
+        sideUIFont = generator.generateFont(parameter);
+        sideUIFont.getData().setScale(1 / 32f);
+
+        //font for weather on sideUI
+        parameter.color = Color.BLACK;
+        parameter.size = 10;
+        parameter.genMipMaps = true;
+        parameter.magFilter = Texture.TextureFilter.Linear;
+        parameter.minFilter = Texture.TextureFilter.Linear;
+        weatherFont = generator.generateFont(parameter);
+        weatherFont.getData().setScale(1 / 32f);
+
         generator.dispose();
         font.setUseIntegerPositions(false);
         gameFont.setUseIntegerPositions(false);
+        sideUIFont.setUseIntegerPositions(false);
+        weatherFont.setUseIntegerPositions(false);
 
         // shared skin
         skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
