@@ -2,6 +2,7 @@ package io.github.firestreaker2.weatherlords;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -38,6 +39,7 @@ public class Weatherlords extends Game {
     public Skin skin;
     public Label.LabelStyle labelStyle;
     public TextButton.TextButtonStyle textButtonStyle;
+    private Music bgm;
 
     public void create() {
         batch = new SpriteBatch();
@@ -114,6 +116,11 @@ public class Weatherlords extends Game {
         config.put(Config.TOUCH, "SPACE");
         config.put(Config.VOLUME, "1"); // 0f-1f
         config.put(Config.FOV, "1"); // 0f-2f
+
+        // bgm
+        bgm = Gdx.audio.newMusic(Gdx.files.internal("music.mp3"));
+        bgm.setLooping(true);
+        bgm.play();
 
         this.setScreen(new MainMenu(this));
     }
