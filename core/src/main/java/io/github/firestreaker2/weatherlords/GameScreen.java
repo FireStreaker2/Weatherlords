@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -250,32 +251,73 @@ public class GameScreen extends InputAdapter implements Screen {
             }
         }
 
-        // farm stuff
+        /**
+         * FARM STUFF
+         *
+         * return values are calculated via:
+         * initial cost / 2 * weather factor
+         *
+         * 1 - farms (-20)
+         * 2 - workshop (-50)
+         * 3 - mine (-100)
+         * 4 - big farm (-500)
+         * 5 - big workshop (-1000)
+         * 6 - big mine (-5000)
+         * 7 - large farm (-10000)
+         * 8 - large workshop (-50000)
+         * 9 - large mine (-100000)
+         * 0 - diamond mine (-500000)
+         */
         TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
         TiledMapTileLayer.Cell belowCell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles - 1);
         TiledMapTileLayer farm = ((TiledMapTileLayer) (tiledMap.getLayers().get("farmLayer")));
 
-        if (Gdx.input.isKeyJustPressed(Util.getKey(game.getConfig(Weatherlords.Config.TOUCH)))) {
-            TiledMapTileLayer.Cell farmCell = farm.getCell(0, 1);
-            TiledMapTileLayer.Cell farmCellBelow = farm.getCell(0, 0);
+        TiledMapTileLayer.Cell farmCell = farm.getCell(0, 1);
+        TiledMapTileLayer.Cell farmCellBelow = farm.getCell(0, 0);
+        TiledMapTileLayer.Cell workshopCell = farm.getCell(1, 0);
+        TiledMapTileLayer.Cell mineCell = farm.getCell(2, 0);
+        TiledMapTileLayer.Cell bigFarmCell = farm.getCell(8, 1);
+        TiledMapTileLayer.Cell bigFarmCellBelow = farm.getCell(8, 0);
+        TiledMapTileLayer.Cell bigWorkshopCell = farm.getCell(6, 0);
+        TiledMapTileLayer.Cell bigMineCell = farm.getCell(3, 0);
+        TiledMapTileLayer.Cell largeFarmCell = farm.getCell(9, 1);
+        TiledMapTileLayer.Cell largeFarmCellBelow = farm.getCell(9, 0);
+        TiledMapTileLayer.Cell largeWorkshopCell = farm.getCell(7, 0);
+        TiledMapTileLayer.Cell largeMineCell = farm.getCell(4, 0);
+        TiledMapTileLayer.Cell diamondMineCell = farm.getCell(5, 0);
 
+        TiledMapTileLayer.Cell[] cells = {farmCell, workshopCell, mineCell, bigFarmCell, bigWorkshopCell, bigMineCell, largeFarmCell, largeWorkshopCell, largeMineCell, diamondMineCell};
+        Integer[] cellIds = {
+            farmCell.getTile().getId(),
+            workshopCell.getTile().getId(),
+            mineCell.getTile().getId(),
+            bigFarmCell.getTile().getId(),
+            bigWorkshopCell.getTile().getId(),
+            bigMineCell.getTile().getId(),
+            largeFarmCell.getTile().getId(),
+            largeWorkshopCell.getTile().getId(),
+            largeMineCell.getTile().getId(),
+            diamondMineCell.getTile().getId()
+        };
+        int[] efficiency = {10, 25, 50, 250, 500, 2500, 5000, 25000, 50000, 250000};
+
+
+        if (Gdx.input.isKeyJustPressed(Util.getKey(game.getConfig(Weatherlords.Config.TOUCH)))) {
             // messy logic but its ok
             if (cell != null) {
                 int id = cell.getTile().getId();
-                int belowId = belowCell.getTile().getId();
 
                 if (id >= 11 && id <= 27 && currency >= 10) {
                     currency -= 10;
                     cell.setTile(tiledMap.getTileSets().getTile(3));
                     logs.add("Removed obstacle: -10");
-                } else if (id == farmCell.getTile().getId()) {
+                } else if (Arrays.asList(cellIds).contains(id)) {
                     if (!backcountryFarmers.containsKey(new Vector2(guraXInTiles, guraYInTiles))) {
                         logs.add("Started farming!");
 
                         // pre-calculate currency return using weather
                         double total = 0;
-                        for (int i = 0; i < 8; i++)
-                            total += 10 * weatherReturn.get(weather.get((day + i) % 30));
+                        for (int i = 0; i < 8; i++) total += efficiency[Arrays.asList(cellIds).indexOf(id)] * weatherReturn.get(weather.get((day + i) % 30));
 
                         // [0] = return value
                         // [1] = day of return
@@ -293,7 +335,7 @@ public class GameScreen extends InputAdapter implements Screen {
                             double amount = backcountryFarmers.get(position).get(0);
 
                             currency += (int) Math.round(amount);
-                            logs.add("Collected Farm! +" + amount);
+                            logs.add("Collected! +" + amount);
 
                             backcountryFarmers.remove(position);
                         }
@@ -301,10 +343,8 @@ public class GameScreen extends InputAdapter implements Screen {
                 } else logs.add("Unable to interact");
             }
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
-            TiledMapTileLayer.Cell farmCell = farm.getCell(0, 1);
-            TiledMapTileLayer.Cell farmCellBelow = farm.getCell(0, 0);
 
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
             if (cell != null && belowCell != null) {
                 int id = cell.getTile().getId();
                 int belowId = belowCell.getTile().getId();
@@ -322,14 +362,12 @@ public class GameScreen extends InputAdapter implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
-            TiledMapTileLayer.Cell farmCell = farm.getCell(1, 0);
-
             if (cell != null) {
                 int id = cell.getTile().getId();
 
                 if (id >= 1 && id <= 5 && currency >= 50) {
                     currency -= 50;
-                    int tileId = farmCell.getTile().getId();
+                    int tileId = workshopCell.getTile().getId();
                     cell.setTile(tiledMap.getTileSets().getTile(tileId));
                     logs.add("Placed workshop! -50");
                     farms += 1;
@@ -338,14 +376,13 @@ public class GameScreen extends InputAdapter implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) {
-            TiledMapTileLayer.Cell farmCell = farm.getCell(2, 0);
 
             if (cell != null) {
                 int id = cell.getTile().getId();
 
                 if (id >= 1 && id <= 5 && currency >= 100) {
                     currency -= 100;
-                    int tileId = farmCell.getTile().getId();
+                    int tileId = mineCell.getTile().getId();
                     cell.setTile(tiledMap.getTileSets().getTile(tileId));
                     logs.add("Placed mine! -100");
                     farms += 1;
@@ -354,17 +391,14 @@ public class GameScreen extends InputAdapter implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)) {
-            TiledMapTileLayer.Cell farmCell = farm.getCell(8, 1);
-            TiledMapTileLayer.Cell farmCellBelow = farm.getCell(8, 0);
-
             if (cell != null && belowCell != null) {
                 int id = cell.getTile().getId();
                 int belowId = belowCell.getTile().getId();
 
                 if (id >= 1 && id <= 5 && belowId >= 1 && belowId <= 5 && currency >= 500) {
                     currency -= 20;
-                    int tileId = farmCell.getTile().getId();
-                    int belowTileId = farmCellBelow.getTile().getId();
+                    int tileId = bigFarmCell.getTile().getId();
+                    int belowTileId = bigFarmCellBelow.getTile().getId();
                     cell.setTile(tiledMap.getTileSets().getTile(tileId));
                     belowCell.setTile(tiledMap.getTileSets().getTile(belowTileId));
                     logs.add("Placed big farm! -500");
@@ -374,14 +408,12 @@ public class GameScreen extends InputAdapter implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_5)) {
-            TiledMapTileLayer.Cell farmCell = farm.getCell(6, 0);
-
             if (cell != null) {
                 int id = cell.getTile().getId();
 
                 if (id >= 1 && id <= 5 && currency >= 1000) {
                     currency -= 1000;
-                    int tileId = farmCell.getTile().getId();
+                    int tileId = bigWorkshopCell.getTile().getId();
                     cell.setTile(tiledMap.getTileSets().getTile(tileId));
                     logs.add("Placed big workshop! -1000");
                     farms += 1;
@@ -390,14 +422,12 @@ public class GameScreen extends InputAdapter implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_6)) {
-            TiledMapTileLayer.Cell farmCell = farm.getCell(3, 0);
-
             if (cell != null) {
                 int id = cell.getTile().getId();
 
                 if (id >= 1 && id <= 5 && currency >= 5000) {
                     currency -= 5000;
-                    int tileId = farmCell.getTile().getId();
+                    int tileId = bigMineCell.getTile().getId();
                     cell.setTile(tiledMap.getTileSets().getTile(tileId));
                     logs.add("Placed big mine! -5000");
                     farms += 1;
@@ -406,17 +436,14 @@ public class GameScreen extends InputAdapter implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_7)) {
-            TiledMapTileLayer.Cell farmCell = farm.getCell(9, 1);
-            TiledMapTileLayer.Cell farmCellBelow = farm.getCell(9, 0);
-
             if (cell != null && belowCell != null) {
                 int id = cell.getTile().getId();
                 int belowId = belowCell.getTile().getId();
 
                 if (id >= 1 && id <= 5 && belowId >= 1 && belowId <= 5 && currency >= 10000) {
                     currency -= 10000;
-                    int tileId = farmCell.getTile().getId();
-                    int belowTileId = farmCellBelow.getTile().getId();
+                    int tileId = largeFarmCell.getTile().getId();
+                    int belowTileId = largeFarmCellBelow.getTile().getId();
                     cell.setTile(tiledMap.getTileSets().getTile(tileId));
                     belowCell.setTile(tiledMap.getTileSets().getTile(belowTileId));
                     logs.add("Placed large farm! -10000");
@@ -426,14 +453,12 @@ public class GameScreen extends InputAdapter implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_8)) {
-            TiledMapTileLayer.Cell farmCell = farm.getCell(7, 0);
-
             if (cell != null) {
                 int id = cell.getTile().getId();
 
                 if (id >= 1 && id <= 5 && currency >= 50000) {
                     currency -= 50000;
-                    int tileId = farmCell.getTile().getId();
+                    int tileId = largeWorkshopCell.getTile().getId();
                     cell.setTile(tiledMap.getTileSets().getTile(tileId));
                     logs.add("Placed large workshop! -50000");
                     farms += 1;
@@ -442,14 +467,12 @@ public class GameScreen extends InputAdapter implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_9)) {
-            TiledMapTileLayer.Cell farmCell = farm.getCell(4, 0);
-
             if (cell != null) {
                 int id = cell.getTile().getId();
 
                 if (id >= 1 && id <= 5 && currency >= 100000) {
                     currency -= 100000;
-                    int tileId = farmCell.getTile().getId();
+                    int tileId = largeMineCell.getTile().getId();
                     cell.setTile(tiledMap.getTileSets().getTile(tileId));
                     logs.add("Placed large mine! -100000");
                     farms += 1;
@@ -458,14 +481,12 @@ public class GameScreen extends InputAdapter implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_0)) {
-            TiledMapTileLayer.Cell farmCell = farm.getCell(5, 0);
-
             if (cell != null) {
                 int id = cell.getTile().getId();
 
                 if (id >= 1 && id <= 5 && currency >= 500000) {
                     currency -= 500000;
-                    int tileId = farmCell.getTile().getId();
+                    int tileId = diamondMineCell.getTile().getId();
                     cell.setTile(tiledMap.getTileSets().getTile(tileId));
                     logs.add("Placed diamond mine! -500000");
                     farms += 1;
