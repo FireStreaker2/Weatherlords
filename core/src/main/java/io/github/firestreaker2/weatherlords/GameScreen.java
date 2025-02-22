@@ -268,13 +268,6 @@ public class GameScreen extends InputAdapter implements Screen {
                     currency -= 10;
                     cell.setTile(tiledMap.getTileSets().getTile(3));
                     logs.add("Removed obstacle: -10");
-                } else if (id >= 1 && id <= 5 && belowId >= 1 && belowId <= 5 && currency >= 20) {
-                    currency -= 20;
-                    int tileId = farmCell.getTile().getId();
-                    int belowTileId = farmCellBelow.getTile().getId();
-                    cell.setTile(tiledMap.getTileSets().getTile(tileId));
-                    belowCell.setTile(tiledMap.getTileSets().getTile(belowTileId));
-                    logs.add("Placed farm! -20");
                 } else if (id == farmCell.getTile().getId()) {
                     if (!backcountryFarmers.containsKey(new Vector2(guraXInTiles, guraYInTiles))) {
                         logs.add("Started farming!");
@@ -304,15 +297,210 @@ public class GameScreen extends InputAdapter implements Screen {
                             backcountryFarmers.remove(position);
                         }
                     }
-                    farms += 1;
                 } else logs.add("Unable to interact");
             }
 
             System.out.println(currency);
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.I))
-            System.out.println("(" + guraXInTiles + ", " + guraYInTiles + ")");
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
+            TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
+            TiledMapTileLayer.Cell belowCell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles - 1);
+            TiledMapTileLayer farm = ((TiledMapTileLayer) (tiledMap.getLayers().get("farmLayer")));
+            TiledMapTileLayer.Cell farmCell = farm.getCell(0, 1);
+            TiledMapTileLayer.Cell farmCellBelow = farm.getCell(0, 0);
 
+            if (cell != null) {
+                int id = cell.getTile().getId();
+                int belowId = belowCell.getTile().getId();
+
+                if (id >= 1 && id <= 5 && belowId >= 1 && belowId <= 5 && currency >= 20) {
+                    currency -= 20;
+                    int tileId = farmCell.getTile().getId();
+                    int belowTileId = farmCellBelow.getTile().getId();
+                    cell.setTile(tiledMap.getTileSets().getTile(tileId));
+                    belowCell.setTile(tiledMap.getTileSets().getTile(belowTileId));
+                    logs.add("Placed farm! -20");
+                    farms += 1;
+                }
+            }
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
+            TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
+            TiledMapTileLayer workshop = ((TiledMapTileLayer) (tiledMap.getLayers().get("farmLayer")));
+            TiledMapTileLayer.Cell farmCell = workshop.getCell(1, 0);
+
+            if (cell != null) {
+                int id = cell.getTile().getId();
+
+                if (id >= 1 && id <= 5 && currency >= 50) {
+                    currency -= 50;
+                    int tileId = farmCell.getTile().getId();
+                    cell.setTile(tiledMap.getTileSets().getTile(tileId));
+                    logs.add("Placed workshop! -50");
+                    farms += 1;
+                }
+            }
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) {
+            TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
+            TiledMapTileLayer workshop = ((TiledMapTileLayer) (tiledMap.getLayers().get("farmLayer")));
+            TiledMapTileLayer.Cell farmCell = workshop.getCell(2, 0);
+
+            if (cell != null) {
+                int id = cell.getTile().getId();
+
+                if (id >= 1 && id <= 5 && currency >= 100) {
+                    currency -= 100;
+                    int tileId = farmCell.getTile().getId();
+                    cell.setTile(tiledMap.getTileSets().getTile(tileId));
+                    logs.add("Placed mine! -100");
+                    farms += 1;
+                }
+            }
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)) {
+            TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
+            TiledMapTileLayer.Cell belowCell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles - 1);
+            TiledMapTileLayer farm = ((TiledMapTileLayer) (tiledMap.getLayers().get("farmLayer")));
+            TiledMapTileLayer.Cell farmCell = farm.getCell(8, 1);
+            TiledMapTileLayer.Cell farmCellBelow = farm.getCell(8, 0);
+
+            if (cell != null) {
+                int id = cell.getTile().getId();
+                int belowId = belowCell.getTile().getId();
+
+                if (id >= 1 && id <= 5 && belowId >= 1 && belowId <= 5 && currency >= 500) {
+                    currency -= 20;
+                    int tileId = farmCell.getTile().getId();
+                    int belowTileId = farmCellBelow.getTile().getId();
+                    cell.setTile(tiledMap.getTileSets().getTile(tileId));
+                    belowCell.setTile(tiledMap.getTileSets().getTile(belowTileId));
+                    logs.add("Placed big farm! -500");
+                    farms += 1;
+                }
+            }
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_5)) {
+            TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
+            TiledMapTileLayer workshop = ((TiledMapTileLayer) (tiledMap.getLayers().get("farmLayer")));
+            TiledMapTileLayer.Cell farmCell = workshop.getCell(6, 0);
+
+            if (cell != null) {
+                int id = cell.getTile().getId();
+
+                if (id >= 1 && id <= 5 && currency >= 1000) {
+                    currency -= 1000;
+                    int tileId = farmCell.getTile().getId();
+                    cell.setTile(tiledMap.getTileSets().getTile(tileId));
+                    logs.add("Placed big workshop! -1000");
+                    farms += 1;
+                }
+            }
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_6)) {
+            TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
+            TiledMapTileLayer workshop = ((TiledMapTileLayer) (tiledMap.getLayers().get("farmLayer")));
+            TiledMapTileLayer.Cell farmCell = workshop.getCell(3, 0);
+
+            if (cell != null) {
+                int id = cell.getTile().getId();
+
+                if (id >= 1 && id <= 5 && currency >= 5000) {
+                    currency -= 5000;
+                    int tileId = farmCell.getTile().getId();
+                    cell.setTile(tiledMap.getTileSets().getTile(tileId));
+                    logs.add("Placed big mine! -5000");
+                    farms += 1;
+                }
+            }
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_7)) {
+            TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
+            TiledMapTileLayer.Cell belowCell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles - 1);
+            TiledMapTileLayer farm = ((TiledMapTileLayer) (tiledMap.getLayers().get("farmLayer")));
+            TiledMapTileLayer.Cell farmCell = farm.getCell(9, 1);
+            TiledMapTileLayer.Cell farmCellBelow = farm.getCell(9, 0);
+
+            if (cell != null) {
+                int id = cell.getTile().getId();
+                int belowId = belowCell.getTile().getId();
+
+                if (id >= 1 && id <= 5 && belowId >= 1 && belowId <= 5 && currency >= 10000) {
+                    currency -= 10000;
+                    int tileId = farmCell.getTile().getId();
+                    int belowTileId = farmCellBelow.getTile().getId();
+                    cell.setTile(tiledMap.getTileSets().getTile(tileId));
+                    belowCell.setTile(tiledMap.getTileSets().getTile(belowTileId));
+                    logs.add("Placed large farm! -10000");
+                    farms += 1;
+                }
+            }
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_8)) {
+            TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
+            TiledMapTileLayer workshop = ((TiledMapTileLayer) (tiledMap.getLayers().get("farmLayer")));
+            TiledMapTileLayer.Cell farmCell = workshop.getCell(7, 0);
+
+            if (cell != null) {
+                int id = cell.getTile().getId();
+
+                if (id >= 1 && id <= 5 && currency >= 50000) {
+                    currency -= 50000;
+                    int tileId = farmCell.getTile().getId();
+                    cell.setTile(tiledMap.getTileSets().getTile(tileId));
+                    logs.add("Placed large workshop! -50000");
+                    farms += 1;
+                }
+            }
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_9)) {
+            TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
+            TiledMapTileLayer workshop = ((TiledMapTileLayer) (tiledMap.getLayers().get("farmLayer")));
+            TiledMapTileLayer.Cell farmCell = workshop.getCell(4, 0);
+
+            if (cell != null) {
+                int id = cell.getTile().getId();
+
+                if (id >= 1 && id <= 5 && currency >= 100000) {
+                    currency -= 100000;
+                    int tileId = farmCell.getTile().getId();
+                    cell.setTile(tiledMap.getTileSets().getTile(tileId));
+                    logs.add("Placed large mine! -100000");
+                    farms += 1;
+                }
+            }
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_0)) {
+            TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
+            TiledMapTileLayer workshop = ((TiledMapTileLayer) (tiledMap.getLayers().get("farmLayer")));
+            TiledMapTileLayer.Cell farmCell = workshop.getCell(5, 0);
+
+            if (cell != null) {
+                int id = cell.getTile().getId();
+
+                if (id >= 1 && id <= 5 && currency >= 500000) {
+                    currency -= 500000;
+                    int tileId = farmCell.getTile().getId();
+                    cell.setTile(tiledMap.getTileSets().getTile(tileId));
+                    logs.add("Placed diamond mine! -500000");
+                    farms += 1;
+                }
+            }
+        }
+
+        //Check GuraX or GuraY with code below
+        //if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
+            //System.out.println("(" + guraXInTiles + ", " + guraYInTiles + ")");
+        //}
 
         // Clamp the sprite to screen bounds
         guraSprite.setX(MathUtils.clamp(guraSprite.getX(), minX, maxX));
@@ -387,7 +575,7 @@ public class GameScreen extends InputAdapter implements Screen {
         } else {
             game.sideUIFont.draw(spriteBatch, "$" + currencyString, sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - 0.5f);
         }
-        game.sideUIFont.draw(spriteBatch, "Farms:", sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - 2f);
+        game.sideUIFont.draw(spriteBatch, "Buildings:", sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - 2f);
         game.sideUIFont.draw(spriteBatch, Integer.toString(farms), sideUI.getX() + 0.25f, sideUI.getHeight() + bottomUI.getHeight() - 2.5f);
         game.sideUIFont.draw(spriteBatch, "Buy:", sideUI.getX() + 0.25f, sideUI.getHeight() + bottomUI.getHeight() - 3f);
         if (currency >= 20) {
@@ -397,7 +585,7 @@ public class GameScreen extends InputAdapter implements Screen {
         }
         game.weatherFont.draw(spriteBatch, "Weather:", sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - 4.5f);
         float sideY = 5f;
-        for (int i = day; i < day + 7; i++) {
+        for (int i = day - 1; i < day + 6; i++) {
             game.weatherFont.draw(spriteBatch, weather.get(i), sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - sideY);
             sideY += 0.5f;
         }
