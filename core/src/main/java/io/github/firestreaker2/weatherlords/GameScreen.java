@@ -34,6 +34,7 @@ public class GameScreen extends InputAdapter implements Screen {
 
     float elapsed = 0;
     int day = 1;
+    int totalDaysPassed = 0;
 
     Texture pfp;
     Texture sideUITexture;
@@ -109,13 +110,9 @@ public class GameScreen extends InputAdapter implements Screen {
         int mapWidth = ((TiledMapTileLayer) tiledMap.getLayers().get("Background")).getWidth();
         int mapHeight = ((TiledMapTileLayer) tiledMap.getLayers().get("Background")).getHeight();
 
-        // Get map dimensions in world units
-        float mapWidthInUnits = mapWidth; // Tile count along x-axis
-        float mapHeightInUnits = mapHeight; // Tile count along y-axis
-
         // Clamp camera position to prevent going outside the map bounds
-        camera.position.x = MathUtils.clamp(camera.position.x, cameraHalfWidth, mapWidthInUnits - cameraHalfWidth);
-        camera.position.y = MathUtils.clamp(camera.position.y, cameraHalfHeight, mapHeightInUnits - cameraHalfHeight);
+        camera.position.x = MathUtils.clamp(camera.position.x, cameraHalfWidth, (float) mapWidth - cameraHalfWidth);
+        camera.position.y = MathUtils.clamp(camera.position.y, cameraHalfHeight, (float) mapHeight - cameraHalfHeight);
 
         camera.update();
     }
@@ -137,14 +134,13 @@ public class GameScreen extends InputAdapter implements Screen {
 
         // TODO: set to `300` for actual game
         if (elapsed >= 1f) {
-            day++;
+            day = (day + 1) % 30;
+            if (day == 0) day = 1;
             elapsed = 0;
 
-            // restart weather at the end
-            if (day >= 29) day = 1;
+            totalDaysPassed++;
 
-            if (weather.get(day).equals(weather.get(day - 1))) logs.add("New day!");
-            else logs.add("New day! Weather: " + weather.get(day));
+            logs.add("New day! Weather: " + weather.get(day));
         }
 
         draw();
@@ -166,6 +162,7 @@ public class GameScreen extends InputAdapter implements Screen {
         float maxX = game.viewport.getWorldWidth() - guraSprite.getWidth();
         float maxY = game.viewport.getWorldHeight() - guraSprite.getHeight();
 
+        // movement
         if (Gdx.input.isKeyJustPressed(Util.getKey(game.getConfig(Weatherlords.Config.UP)))) {
             isColliding = false;
 
@@ -252,10 +249,13 @@ public class GameScreen extends InputAdapter implements Screen {
                 }
             }
         }
+
+        // farm stuff
+        TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
+        TiledMapTileLayer.Cell belowCell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles - 1);
+        TiledMapTileLayer farm = ((TiledMapTileLayer) (tiledMap.getLayers().get("farmLayer")));
+
         if (Gdx.input.isKeyJustPressed(Util.getKey(game.getConfig(Weatherlords.Config.TOUCH)))) {
-            TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
-            TiledMapTileLayer.Cell belowCell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles - 1);
-            TiledMapTileLayer farm = ((TiledMapTileLayer) (tiledMap.getLayers().get("farmLayer")));
             TiledMapTileLayer.Cell farmCell = farm.getCell(0, 1);
             TiledMapTileLayer.Cell farmCellBelow = farm.getCell(0, 0);
 
@@ -282,16 +282,17 @@ public class GameScreen extends InputAdapter implements Screen {
                         double finalTotal = total;
                         List<Double> values = new ArrayList<Double>() {{
                             add(finalTotal);
-                            add((double) (day + 10));
+                            add((double) (totalDaysPassed + 10));
                         }};
 
                         backcountryFarmers.put(new Vector2(guraXInTiles, guraYInTiles), values);
                     } else {
                         Vector2 position = new Vector2(guraXInTiles, guraYInTiles);
-                        if (backcountryFarmers.get(position).get(1) % 30 <= day) {
+
+                        if (totalDaysPassed >= backcountryFarmers.get(position).get(1)) {
                             double amount = backcountryFarmers.get(position).get(0);
 
-                            currency += (int) amount;
+                            currency += (int) Math.round(amount);
                             logs.add("Collected Farm! +" + amount);
 
                             backcountryFarmers.remove(position);
@@ -299,17 +300,12 @@ public class GameScreen extends InputAdapter implements Screen {
                     }
                 } else logs.add("Unable to interact");
             }
-
-            System.out.println(currency);
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
-            TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
-            TiledMapTileLayer.Cell belowCell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles - 1);
-            TiledMapTileLayer farm = ((TiledMapTileLayer) (tiledMap.getLayers().get("farmLayer")));
             TiledMapTileLayer.Cell farmCell = farm.getCell(0, 1);
             TiledMapTileLayer.Cell farmCellBelow = farm.getCell(0, 0);
 
-            if (cell != null) {
+            if (cell != null && belowCell != null) {
                 int id = cell.getTile().getId();
                 int belowId = belowCell.getTile().getId();
 
@@ -326,9 +322,7 @@ public class GameScreen extends InputAdapter implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
-            TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
-            TiledMapTileLayer workshop = ((TiledMapTileLayer) (tiledMap.getLayers().get("farmLayer")));
-            TiledMapTileLayer.Cell farmCell = workshop.getCell(1, 0);
+            TiledMapTileLayer.Cell farmCell = farm.getCell(1, 0);
 
             if (cell != null) {
                 int id = cell.getTile().getId();
@@ -344,9 +338,7 @@ public class GameScreen extends InputAdapter implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) {
-            TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
-            TiledMapTileLayer workshop = ((TiledMapTileLayer) (tiledMap.getLayers().get("farmLayer")));
-            TiledMapTileLayer.Cell farmCell = workshop.getCell(2, 0);
+            TiledMapTileLayer.Cell farmCell = farm.getCell(2, 0);
 
             if (cell != null) {
                 int id = cell.getTile().getId();
@@ -362,13 +354,10 @@ public class GameScreen extends InputAdapter implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)) {
-            TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
-            TiledMapTileLayer.Cell belowCell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles - 1);
-            TiledMapTileLayer farm = ((TiledMapTileLayer) (tiledMap.getLayers().get("farmLayer")));
             TiledMapTileLayer.Cell farmCell = farm.getCell(8, 1);
             TiledMapTileLayer.Cell farmCellBelow = farm.getCell(8, 0);
 
-            if (cell != null) {
+            if (cell != null && belowCell != null) {
                 int id = cell.getTile().getId();
                 int belowId = belowCell.getTile().getId();
 
@@ -385,9 +374,7 @@ public class GameScreen extends InputAdapter implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_5)) {
-            TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
-            TiledMapTileLayer workshop = ((TiledMapTileLayer) (tiledMap.getLayers().get("farmLayer")));
-            TiledMapTileLayer.Cell farmCell = workshop.getCell(6, 0);
+            TiledMapTileLayer.Cell farmCell = farm.getCell(6, 0);
 
             if (cell != null) {
                 int id = cell.getTile().getId();
@@ -403,9 +390,7 @@ public class GameScreen extends InputAdapter implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_6)) {
-            TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
-            TiledMapTileLayer workshop = ((TiledMapTileLayer) (tiledMap.getLayers().get("farmLayer")));
-            TiledMapTileLayer.Cell farmCell = workshop.getCell(3, 0);
+            TiledMapTileLayer.Cell farmCell = farm.getCell(3, 0);
 
             if (cell != null) {
                 int id = cell.getTile().getId();
@@ -421,13 +406,10 @@ public class GameScreen extends InputAdapter implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_7)) {
-            TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
-            TiledMapTileLayer.Cell belowCell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles - 1);
-            TiledMapTileLayer farm = ((TiledMapTileLayer) (tiledMap.getLayers().get("farmLayer")));
             TiledMapTileLayer.Cell farmCell = farm.getCell(9, 1);
             TiledMapTileLayer.Cell farmCellBelow = farm.getCell(9, 0);
 
-            if (cell != null) {
+            if (cell != null && belowCell != null) {
                 int id = cell.getTile().getId();
                 int belowId = belowCell.getTile().getId();
 
@@ -444,9 +426,7 @@ public class GameScreen extends InputAdapter implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_8)) {
-            TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
-            TiledMapTileLayer workshop = ((TiledMapTileLayer) (tiledMap.getLayers().get("farmLayer")));
-            TiledMapTileLayer.Cell farmCell = workshop.getCell(7, 0);
+            TiledMapTileLayer.Cell farmCell = farm.getCell(7, 0);
 
             if (cell != null) {
                 int id = cell.getTile().getId();
@@ -462,9 +442,7 @@ public class GameScreen extends InputAdapter implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_9)) {
-            TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
-            TiledMapTileLayer workshop = ((TiledMapTileLayer) (tiledMap.getLayers().get("farmLayer")));
-            TiledMapTileLayer.Cell farmCell = workshop.getCell(4, 0);
+            TiledMapTileLayer.Cell farmCell = farm.getCell(4, 0);
 
             if (cell != null) {
                 int id = cell.getTile().getId();
@@ -480,9 +458,7 @@ public class GameScreen extends InputAdapter implements Screen {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_0)) {
-            TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) (tiledMap.getLayers().get("ground"))).getCell(guraXInTiles, guraYInTiles);
-            TiledMapTileLayer workshop = ((TiledMapTileLayer) (tiledMap.getLayers().get("farmLayer")));
-            TiledMapTileLayer.Cell farmCell = workshop.getCell(5, 0);
+            TiledMapTileLayer.Cell farmCell = farm.getCell(5, 0);
 
             if (cell != null) {
                 int id = cell.getTile().getId();
@@ -496,11 +472,6 @@ public class GameScreen extends InputAdapter implements Screen {
                 }
             }
         }
-
-        //Check GuraX or GuraY with code below
-        //if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
-            //System.out.println("(" + guraXInTiles + ", " + guraYInTiles + ")");
-        //}
 
         // Clamp the sprite to screen bounds
         guraSprite.setX(MathUtils.clamp(guraSprite.getX(), minX, maxX));
@@ -566,29 +537,30 @@ public class GameScreen extends InputAdapter implements Screen {
             y += 0.6f;
         }
 
+        // 100% optimization
         String currencyString = Integer.toString(currency);
         if (currencyString.length() > 4) {
             String firstCurrencyString = currencyString.substring(0, 4);
             String secondCurrencyString = currencyString.substring(4);
             game.sideUIFont.draw(spriteBatch, "$" + firstCurrencyString, sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - 0.5f);
             game.sideUIFont.draw(spriteBatch, secondCurrencyString, sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - 1f);
-        } else {
+        } else
             game.sideUIFont.draw(spriteBatch, "$" + currencyString, sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - 0.5f);
-        }
-        game.sideUIFont.draw(spriteBatch, "Buildings:", sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - 2f);
+
+        game.sideUIFont.draw(spriteBatch, "Farms:", sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - 2f);
         game.sideUIFont.draw(spriteBatch, Integer.toString(farms), sideUI.getX() + 0.25f, sideUI.getHeight() + bottomUI.getHeight() - 2.5f);
-        game.sideUIFont.draw(spriteBatch, "Buy:", sideUI.getX() + 0.25f, sideUI.getHeight() + bottomUI.getHeight() - 3f);
-        if (currency >= 20) {
-            game.sideUIFont.draw(spriteBatch, "Yes", sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - 3.5f);
-        } else {
-            game.sideUIFont.draw(spriteBatch, "No", sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - 3.5f);
-        }
+        game.sideUIFont.draw(spriteBatch, "Day:", sideUI.getX() + 0.25f, sideUI.getHeight() + bottomUI.getHeight() - 3f);
+        game.sideUIFont.draw(spriteBatch, day + "", sideUI.getX() + 0.25f, sideUI.getHeight() + bottomUI.getHeight() - 3.5f);
         game.weatherFont.draw(spriteBatch, "Weather:", sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - 4.5f);
         float sideY = 5f;
-        for (int i = day - 1; i < day + 6; i++) {
-            game.weatherFont.draw(spriteBatch, weather.get(i), sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - sideY);
+        for (int i = day + 2; i < day + 9; i++) {
+            int index = (i % 30);
+            if (index == 0) index = 30;
+
+            game.weatherFont.draw(spriteBatch, weather.get(index - 1), sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - sideY);
             sideY += 0.5f;
         }
+
         spriteBatch.end();
     }
 
