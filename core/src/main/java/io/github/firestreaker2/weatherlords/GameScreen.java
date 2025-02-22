@@ -22,15 +22,18 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class GameScreen extends InputAdapter implements Screen {
     final Weatherlords game;
     final List<String> logs = new ArrayList<>();
     final List<String> weather = new ArrayList<>();
+    final HashMap<String, Double> weatherReturn = new HashMap<>();
+    final HashMap<Vector2, List<Double>> backcountryFarmers = new HashMap<>();
 
     float elapsed = 0;
-    int day = 0;
+    int day = 1;
 
     Texture pfp;
     Texture sideUITexture;
@@ -54,9 +57,17 @@ public class GameScreen extends InputAdapter implements Screen {
 
         Gdx.input.setInputProcessor(this);
 
-        String[] events = {"Sunny", "Rainy", "Tornado", "Drought", "Snowy", "Icy"};
+        String[] events = {"Sunny", "Sunny", "Sunny", "Rainy", "Rainy", "Rainy", "Tornado", "Drought", "Snowy", "Icy"};
         // pre-generate all weather events
         for (int i = 0; i < 30; i++) weather.add(events[(int) (Math.random() * events.length)]);
+
+        // initialize weather return values
+        weatherReturn.put("Sunny", 1.5);
+        weatherReturn.put("Rainy", 1.5);
+        weatherReturn.put("Tornado", 0.7);
+        weatherReturn.put("Drought", 0.2);
+        weatherReturn.put("Snowy", 0.3);
+        weatherReturn.put("Icy", 0.4);
 
         touchPos = new Vector2();
         pfp = new Texture("Selector.png");
@@ -124,12 +135,13 @@ public class GameScreen extends InputAdapter implements Screen {
     public void render(float delta) {
         elapsed += delta;
 
-        if (elapsed >= 5f) {
+        // TODO: set to `300` for actual game
+        if (elapsed >= 1f) {
             day++;
             elapsed = 0;
 
             // restart weather at the end
-            if (day == 29) day = 0;
+            if (day >= 29) day = 1;
 
             if (weather.get(day).equals(weather.get(day - 1))) logs.add("New day!");
             else logs.add("New day! Weather: " + weather.get(day));
@@ -157,8 +169,6 @@ public class GameScreen extends InputAdapter implements Screen {
         if (Gdx.input.isKeyJustPressed(Util.getKey(game.getConfig(Weatherlords.Config.UP)))) {
             isColliding = false;
 
-            logs.add(game.getConfig(Weatherlords.Config.UP));
-
             // Calculates the position of the next tile
             int guraNextYInTiles = guraYInTiles + 1;
             if (guraNextYInTiles > 99) {
@@ -180,8 +190,6 @@ public class GameScreen extends InputAdapter implements Screen {
         }
         if (Gdx.input.isKeyJustPressed(Util.getKey(game.getConfig(Weatherlords.Config.DOWN)))) {
             isColliding = false;
-
-            logs.add(game.getConfig(Weatherlords.Config.DOWN));
 
             // Calculates the position of the next tile
             int guraNextYInTiles = guraYInTiles - 1;
@@ -205,8 +213,6 @@ public class GameScreen extends InputAdapter implements Screen {
         if (Gdx.input.isKeyJustPressed(Util.getKey(game.getConfig(Weatherlords.Config.LEFT)))) {
             isColliding = false;
 
-            logs.add(game.getConfig(Weatherlords.Config.LEFT));
-
             int guraNextXInTiles = guraXInTiles - 1;
             if (guraNextXInTiles < 0) {
                 guraNextXInTiles = 0;
@@ -227,8 +233,6 @@ public class GameScreen extends InputAdapter implements Screen {
         }
         if (Gdx.input.isKeyJustPressed(Util.getKey(game.getConfig(Weatherlords.Config.RIGHT)))) {
             isColliding = false;
-
-            logs.add(game.getConfig(Weatherlords.Config.RIGHT));
 
             int guraNextXInTiles = guraXInTiles + 1;
             if (guraNextXInTiles > 99) {
@@ -255,6 +259,7 @@ public class GameScreen extends InputAdapter implements Screen {
             TiledMapTileLayer.Cell farmCell = farm.getCell(0, 1);
             TiledMapTileLayer.Cell farmCellBelow = farm.getCell(0, 0);
 
+            // messy logic but its ok
             if (cell != null) {
                 int id = cell.getTile().getId();
                 int belowId = belowCell.getTile().getId();
@@ -270,9 +275,40 @@ public class GameScreen extends InputAdapter implements Screen {
                     cell.setTile(tiledMap.getTileSets().getTile(tileId));
                     belowCell.setTile(tiledMap.getTileSets().getTile(belowTileId));
                     logs.add("Placed farm! -20");
+                } else if (id == farmCell.getTile().getId()) {
+                    if (!backcountryFarmers.containsKey(new Vector2(guraXInTiles, guraYInTiles))) {
+                        logs.add("Started farming!");
+
+                        // pre-calculate currency return using weather
+                        double total = 0;
+                        for (int i = 0; i < 8; i++)
+                            total += 10 * weatherReturn.get(weather.get((day + i) % 30));
+
+                        // [0] = return value
+                        // [1] = day of return
+                        double finalTotal = total;
+                        List<Double> values = new ArrayList<Double>() {{
+                            add(finalTotal);
+                            add((double) (day + 10));
+                        }};
+
+                        backcountryFarmers.put(new Vector2(guraXInTiles, guraYInTiles), values);
+                    } else {
+                        Vector2 position = new Vector2(guraXInTiles, guraYInTiles);
+                        if (backcountryFarmers.get(position).get(1) % 30 <= day) {
+                            double amount = backcountryFarmers.get(position).get(0);
+
+                            currency += (int) amount;
+                            logs.add("Collected Farm! +" + amount);
+
+                            backcountryFarmers.remove(position);
+                        }
+                    }
                     farms += 1;
                 } else logs.add("Unable to interact");
             }
+
+            System.out.println(currency);
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.I))
             System.out.println("(" + guraXInTiles + ", " + guraYInTiles + ")");
