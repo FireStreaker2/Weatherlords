@@ -333,7 +333,7 @@ public class GameScreen extends InputAdapter implements Screen {
                             }};
 
                             backcountryFarmers.put(new Vector2(guraXInTiles, guraYInTiles), values);
-                        } else logs.add("Unable to interact");
+                        } else logs.add("Not enough money");
                     } else {
                         Vector2 position = new Vector2(guraXInTiles, guraYInTiles);
 
