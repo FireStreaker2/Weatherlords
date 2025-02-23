@@ -1,3 +1,4 @@
+
 package io.github.firestreaker2.weatherlords;
 
 import com.badlogic.gdx.Gdx;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.lang.Math;
 
 public class GameScreen extends InputAdapter implements Screen {
     final Weatherlords game;
@@ -65,7 +67,7 @@ public class GameScreen extends InputAdapter implements Screen {
 
         // initialize weather return values
         weatherReturn.put("Sunny", 1.5);
-        weatherReturn.put("Rainy", 1.5);
+        weatherReturn.put("Rainy", 2.0);
         weatherReturn.put("Tornado", 0.7);
         weatherReturn.put("Drought", 0.2);
         weatherReturn.put("Snowy", 0.3);
@@ -316,12 +318,14 @@ public class GameScreen extends InputAdapter implements Screen {
                         logs.add("Started farming!");
 
                         // pre-calculate currency return using weather
-                        double total = 0;
-                        for (int i = 0; i < 8; i++) total += efficiency[Arrays.asList(cellIds).indexOf(id)] * weatherReturn.get(weather.get((day + i) % 30));
-
+                        double total = 1;
+                        currency -= efficiency[Arrays.asList(cellIds).indexOf(id)];
+                        for (int i = 0; i < 8; i++) {
+                            total *= weatherReturn.get(weather.get((day + i) % 30));
+                        }
                         // [0] = return value
                         // [1] = day of return
-                        double finalTotal = total;
+                        double finalTotal = (float) Math.round(efficiency[Arrays.asList(cellIds).indexOf(id)] * total);
                         List<Double> values = new ArrayList<Double>() {{
                             add(finalTotal);
                             add((double) (totalDaysPassed + 10));
@@ -571,9 +575,17 @@ public class GameScreen extends InputAdapter implements Screen {
         game.sideUIFont.draw(spriteBatch, "Farms:", sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - 2f);
         game.sideUIFont.draw(spriteBatch, Integer.toString(farms), sideUI.getX() + 0.25f, sideUI.getHeight() + bottomUI.getHeight() - 2.5f);
         game.sideUIFont.draw(spriteBatch, "Day:", sideUI.getX() + 0.25f, sideUI.getHeight() + bottomUI.getHeight() - 3f);
-        game.sideUIFont.draw(spriteBatch, day + "", sideUI.getX() + 0.25f, sideUI.getHeight() + bottomUI.getHeight() - 3.5f);
-        game.weatherFont.draw(spriteBatch, "Weather:", sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - 4.5f);
-        float sideY = 5f;
+        if (totalDaysPassed < 100000) {
+            game.sideUIFont.draw(spriteBatch, totalDaysPassed + "", sideUI.getX() + 0.25f, sideUI.getHeight() + bottomUI.getHeight() - 3.5f);
+        } else {
+            String totalPassedDays = totalDaysPassed + "";
+            String totalPassedDays1 = totalPassedDays.substring(0, 5);
+            String totalPassedDays2 = totalPassedDays.substring(5);
+            game.sideUIFont.draw(spriteBatch, totalPassedDays1, sideUI.getX() + 0.25f, sideUI.getHeight() + bottomUI.getHeight() - 3.5f);
+            game.sideUIFont.draw(spriteBatch, totalPassedDays2, sideUI.getX() + 0.25f, sideUI.getHeight() + bottomUI.getHeight() - 4f);
+        }
+        game.weatherFont.draw(spriteBatch, "Weather:", sideUI.getX() + 0.2f, sideUI.getHeight() + bottomUI.getHeight() - 5f);
+        float sideY = 5.5f;
         for (int i = day + 2; i < day + 9; i++) {
             int index = (i % 30);
             if (index == 0) index = 30;
