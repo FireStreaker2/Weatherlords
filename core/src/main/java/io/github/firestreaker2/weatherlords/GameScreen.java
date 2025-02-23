@@ -315,7 +315,7 @@ public class GameScreen extends InputAdapter implements Screen {
                     logs.add("Removed obstacle: -10");
                 } else if (Arrays.asList(cellIds).contains(id)) {
                     if (!backcountryFarmers.containsKey(new Vector2(guraXInTiles, guraYInTiles))) {
-                        logs.add("Started farming!");
+                        logs.add("Started collecting resources!");
 
                         // pre-calculate currency return using weather
                         double total = 1;
