@@ -46,7 +46,6 @@ public class MainMenu implements Screen {
         quitButton.setPosition(300, 60);
 
         // html vibes
-        // TODO: add sounds when buttons are pressed
         Util.addLowTaperFade(stage, game, startButton, "GameScreen");
         Util.addLowTaperFade(stage, game, settingsButton, "SettingsMenu");
         Util.addLowTaperFade(stage, game, creditsButton, "CreditsMenu");

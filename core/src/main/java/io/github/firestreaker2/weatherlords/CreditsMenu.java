@@ -56,11 +56,7 @@ public class CreditsMenu implements Screen {
         stage.act(delta);
         stage.draw();
 
-        // escape keybind
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            game.setScreen(new MainMenu(game));
-            dispose();
-        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) Util.addLowTaperFade(stage, game, "MainMenu");
     }
 
     @Override

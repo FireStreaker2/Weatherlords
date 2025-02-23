@@ -17,7 +17,7 @@ public class ControlsMenu extends Setting {
         new Vector2(500f, 200f),
         new Vector2(100f, 275f),
         new Vector2(500f, 275f),
-        new Vector2(300f, 200f)
+        new Vector2(300f, 230f)
     };
 
     public ControlsMenu(Weatherlords game) {

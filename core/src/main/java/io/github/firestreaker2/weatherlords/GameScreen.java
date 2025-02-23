@@ -135,7 +135,6 @@ public class GameScreen extends InputAdapter implements Screen {
     public void render(float delta) {
         elapsed += delta;
 
-        // TODO: set to `300` for actual game
         if (elapsed >= 1f) {
             day = (day + 1) % 30;
             if (day == 0) day = 1;

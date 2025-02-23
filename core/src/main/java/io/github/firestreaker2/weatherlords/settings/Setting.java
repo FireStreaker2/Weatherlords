@@ -154,6 +154,9 @@ public abstract class Setting implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 game.editConfig(config, slider.getValue() + "");
+
+                if (config == Weatherlords.Config.VOLUME)
+                    game.bgm.setVolume(Float.parseFloat(game.getConfig(Weatherlords.Config.VOLUME)));
             }
         });
 
@@ -167,11 +170,7 @@ public abstract class Setting implements Screen {
         stage.act(delta);
         stage.draw();
 
-        // escape keybind
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            game.setScreen(new SettingsMenu(game));
-            dispose();
-        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) Util.addLowTaperFade(stage, game, "SettingsMenu");
     }
 
     @Override

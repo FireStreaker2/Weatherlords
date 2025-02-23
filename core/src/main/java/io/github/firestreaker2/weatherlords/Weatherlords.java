@@ -25,7 +25,7 @@ import java.util.EnumMap;
 public class Weatherlords extends Game {
     // actual game config
     // TODO: also store config in separate file to persist through sessions(?)
-    private final EnumMap<Config, String> config = new EnumMap<>(Config.class); // TODO: actually use config in gameplay
+    private final EnumMap<Config, String> config = new EnumMap<>(Config.class);
     /**
      * universal config
      * access via `game.<config>`
@@ -39,7 +39,7 @@ public class Weatherlords extends Game {
     public Skin skin;
     public Label.LabelStyle labelStyle;
     public TextButton.TextButtonStyle textButtonStyle;
-    private Music bgm;
+    public Music bgm;
 
     public void create() {
         batch = new SpriteBatch();
@@ -120,6 +120,7 @@ public class Weatherlords extends Game {
         // bgm
         bgm = Gdx.audio.newMusic(Gdx.files.internal("music.mp3"));
         bgm.setLooping(true);
+        bgm.setVolume(Float.parseFloat(getConfig(Config.VOLUME)));
         bgm.play();
 
         this.setScreen(new MainMenu(this));

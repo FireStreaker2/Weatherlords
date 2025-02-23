@@ -43,6 +43,25 @@ public class Util {
     }
 
     /**
+     * addLowTaperFade
+     * massive transition v2
+     *
+     * @param stage
+     * @param game
+     * @param screen
+     */
+    public static void addLowTaperFade(final Stage stage, final Weatherlords game, String screen) {
+        stage.addAction(Actions.sequence(
+            Actions.fadeOut(0.1f), // low duration
+            Actions.run(() -> {
+                game.setScreen(convert(screen, game));
+                stage.dispose();
+            }),
+            Actions.fadeIn(0.1f)
+        ));
+    }
+
+    /**
      * convert
      * <p>
      * converts string to class on the fly during

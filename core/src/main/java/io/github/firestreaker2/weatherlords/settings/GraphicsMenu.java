@@ -10,6 +10,7 @@ public class GraphicsMenu extends Setting {
     @Override
     protected void content() {
         createLabel("GRAPHICS");
+        createLabel("COMING SOON", stage.getWidth() / 2 - 90, 250);
         createButton("DONE", stage.getWidth() / 2 - 100, 60, "SettingsMenu");
     }
 }
