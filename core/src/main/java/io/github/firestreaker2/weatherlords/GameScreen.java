@@ -315,23 +315,25 @@ public class GameScreen extends InputAdapter implements Screen {
                     logs.add("Removed obstacle: -10");
                 } else if (Arrays.asList(cellIds).contains(id)) {
                     if (!backcountryFarmers.containsKey(new Vector2(guraXInTiles, guraYInTiles))) {
-                        logs.add("Started collecting resources!");
+                        if (currency >= efficiency[Arrays.asList(cellIds).indexOf(id)]) {
+                            logs.add("Started collecting resources!");
 
-                        // pre-calculate currency return using weather
-                        double total = 1;
-                        currency -= efficiency[Arrays.asList(cellIds).indexOf(id)];
-                        for (int i = 0; i < 8; i++) {
-                            total *= weatherReturn.get(weather.get((day + i) % 30));
-                        }
-                        // [0] = return value
-                        // [1] = day of return
-                        double finalTotal = (float) Math.round(efficiency[Arrays.asList(cellIds).indexOf(id)] * total);
-                        List<Double> values = new ArrayList<Double>() {{
-                            add(finalTotal);
-                            add((double) (totalDaysPassed + 10));
-                        }};
+                            // pre-calculate currency return using weather
+                            double total = 1;
+                            currency -= efficiency[Arrays.asList(cellIds).indexOf(id)];
+                            for (int i = 0; i < 8; i++) {
+                                total *= weatherReturn.get(weather.get((day + i) % 30));
+                            }
+                            // [0] = return value
+                            // [1] = day of return
+                            double finalTotal = (float) Math.round(efficiency[Arrays.asList(cellIds).indexOf(id)] * total);
+                            List<Double> values = new ArrayList<Double>() {{
+                                add(finalTotal);
+                                add((double) (totalDaysPassed + 10));
+                            }};
 
-                        backcountryFarmers.put(new Vector2(guraXInTiles, guraYInTiles), values);
+                            backcountryFarmers.put(new Vector2(guraXInTiles, guraYInTiles), values);
+                        } else logs.add("Unable to interact");
                     } else {
                         Vector2 position = new Vector2(guraXInTiles, guraYInTiles);
 
