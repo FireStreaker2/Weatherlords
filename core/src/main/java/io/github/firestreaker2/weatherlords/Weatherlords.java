@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -36,6 +37,7 @@ public class Weatherlords extends Game {
     public BitmapFont sideUIFont;
     public BitmapFont weatherFont;
     public FitViewport viewport;
+    public Image background;
     public Skin skin;
     public Label.LabelStyle labelStyle;
     public TextButton.TextButtonStyle textButtonStyle;
@@ -44,6 +46,11 @@ public class Weatherlords extends Game {
     public void create() {
         batch = new SpriteBatch();
         viewport = new FitViewport(14, 10);
+
+        // background for menus
+        background = new Image(new TextureRegion(new Texture(Gdx.files.internal("bg.png"))));
+        background.setPosition(0, 0);
+        background.setSize(800, 480);
 
         // messy font generator thing
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Cinzel.ttf"));
@@ -117,6 +124,9 @@ public class Weatherlords extends Game {
         config.put(Config.VOLUME, "1"); // 0f-1f
         config.put(Config.FOV, "1"); // 0f-2f
 
+        // extra variable for main menu transition
+        config.put(Config.ANIMATION, "false");
+
         // bgm
         bgm = Gdx.audio.newMusic(Gdx.files.internal("music.mp3"));
         bgm.setLooping(true);
@@ -157,6 +167,6 @@ public class Weatherlords extends Game {
 
     // global config enum
     public enum Config {
-        UP, DOWN, LEFT, RIGHT, TOUCH, VOLUME, FOV
+        UP, DOWN, LEFT, RIGHT, TOUCH, VOLUME, FOV, ANIMATION
     }
 }

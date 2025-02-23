@@ -3,8 +3,10 @@ package io.github.firestreaker2.weatherlords;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -56,16 +58,33 @@ public class MainMenu implements Screen {
             }
         });
 
+        stage.addActor(game.background);
         stage.addActor(title);
         stage.addActor(startButton);
         stage.addActor(settingsButton);
         stage.addActor(creditsButton);
         stage.addActor(quitButton);
+
+        if (game.getConfig(Weatherlords.Config.ANIMATION).equals("false")) {
+            for (Actor actor : stage.getActors()) actor.getColor().a = 0;
+            game.background.addAction(Actions.sequence(
+                Actions.fadeIn(2f),
+                Actions.run(() -> {
+                    for (Actor actor : stage.getActors()) {
+                        if (actor != game.background) {
+                            actor.addAction(Actions.fadeIn(2f));
+                        }
+                    }
+                })
+            ));
+
+            game.editConfig(Weatherlords.Config.ANIMATION, "true");
+        }
     }
 
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(Color.WHITE);
+        ScreenUtils.clear(Color.BLACK);
 
         stage.act(delta);
         stage.draw();

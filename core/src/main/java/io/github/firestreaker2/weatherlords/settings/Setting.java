@@ -37,6 +37,8 @@ public abstract class Setting implements Screen {
 
         stage = new Stage(new FitViewport(800, 480));
         Gdx.input.setInputProcessor(stage);
+
+        stage.addActor(game.background);
     }
 
     // props
@@ -165,7 +167,7 @@ public abstract class Setting implements Screen {
 
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(Color.WHITE);
+        ScreenUtils.clear(Color.BLACK);
 
         stage.act(delta);
         stage.draw();

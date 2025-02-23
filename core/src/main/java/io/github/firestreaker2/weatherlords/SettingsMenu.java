@@ -42,6 +42,7 @@ public class SettingsMenu implements Screen {
         controlsButton.setPosition(500, 275);
         doneButton.setPosition(stage.getWidth() / 2 - 100, 60);
 
+        stage.addActor(game.background);
         stage.addActor(title);
         for (TextButton button : buttons) {
             button.setSize(200, 60);
@@ -51,7 +52,7 @@ public class SettingsMenu implements Screen {
 
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(Color.WHITE);
+        ScreenUtils.clear(Color.BLACK);
 
         stage.act(delta);
         stage.draw();

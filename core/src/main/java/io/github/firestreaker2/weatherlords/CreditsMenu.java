@@ -44,6 +44,7 @@ public class CreditsMenu implements Screen {
         doneButton.setPosition(stage.getWidth() / 2 - 100, 60);
         doneButton.setSize(200, 60);
 
+        stage.addActor(game.background);
         stage.addActor(title);
         stage.addActor(credits);
         stage.addActor(doneButton);
@@ -51,7 +52,7 @@ public class CreditsMenu implements Screen {
 
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(Color.WHITE);
+        ScreenUtils.clear(Color.BLACK);
 
         stage.act(delta);
         stage.draw();
